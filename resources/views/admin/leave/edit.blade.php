@@ -1,35 +1,35 @@
 @extends('template/main')
 
-@section('title', 'Edit Ketidakhadiran')
+@section('title', 'Edit Cuti')
 
 @section('content')
 
 <main class="app-content">
     <div class="app-title">
         <div>
-            <h1><i class="fa fa-clipboard"></i> Edit Ketidakhadiran</h1>
+            <h1><i class="fa fa-clipboard"></i> Edit Cuti</h1>
         </div>
         <ul class="app-breadcrumb breadcrumb">
             <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.absent.index') }}">Ketidakhadiran</a></li>
-            <li class="breadcrumb-item">Edit Ketidakhadiran</li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.leave.index') }}">Cuti</a></li>
+            <li class="breadcrumb-item">Edit Cuti</li>
         </ul>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="tile">
-                <form method="post" action="{{ route('admin.absent.update') }}">
+                <form method="post" action="{{ route('admin.leave.update') }}">
                     @csrf
-                    <input type="hidden" name="id" value="{{ $absent->id }}">
+                    <input type="hidden" name="id" value="{{ $leave->id }}">
                     <div class="tile-body">
                         <div class="form-group row">
                             <label class="col-md-3 col-lg-2 col-form-label">Karyawan <span class="text-danger">*</span></label>
                             <div class="col-md-9 col-lg-4">
                                 <select name="user_id" class="form-control {{ $errors->has('user_id') ? 'is-invalid' : '' }}" id="member" disabled>
                                     <option value="" selected>--Pilih--</option>
-                                    @foreach(\App\Models\Office::find($absent->user->office->id)->users()->where('role','=',role('member'))->where('end_date','=',null)->orderBy('name','asc')->get() as $user)
-                                    <option value="{{ $user->id }}" {{ $absent->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                                    @foreach(\App\Models\Office::find($leave->user->office->id)->users()->where('role','=',role('member'))->where('end_date','=',null)->orderBy('name','asc')->get() as $user)
+                                    <option value="{{ $user->id }}" {{ $leave->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                                     @endforeach
                                 </select>
                                 @if($errors->has('user_id'))
@@ -38,33 +38,11 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-md-3 col-lg-2 col-form-label">Tanggal Tidak Hadir <span class="text-danger">*</span></label>
+                            <label class="col-md-3 col-lg-2 col-form-label">Tanggal Cuti <span class="text-danger">*</span></label>
                             <div class="col-md-9 col-lg-4">
-                                <input type="text" name="date" class="form-control datepicker {{ $errors->has('date') ? 'is-invalid' : '' }}" value="{{ date('d/m/Y', strtotime($absent->date)) }}" placeholder="Format: dd/mm/yyyy" autocomplete="off">
+                                <input type="text" name="date" class="form-control datepicker {{ $errors->has('date') ? 'is-invalid' : '' }}" value="{{ date('d/m/Y', strtotime($leave->date)) }}" placeholder="Format: dd/mm/yyyy" autocomplete="off">
                                 @if($errors->has('date'))
                                 <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('date')) }}</div>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-lg-2 col-form-label">Tidak Hadir Kenapa? <span class="text-danger">*</span></label>
-                            <div class="col-md-9 col-lg-4">
-                                <select name="category_id" class="form-control {{ $errors->has('category_id') ? 'is-invalid' : '' }}">
-                                    <option value="" selected>--Pilih--</option>
-                                    <option value="1" {{ $absent->category_id == 1 ? 'selected' : '' }}>Sakit</option>
-                                    <option value="2" {{ $absent->category_id == 2 ? 'selected' : '' }}>Izin</option>
-                                </select>
-                                @if($errors->has('category_id'))
-                                <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('category_id')) }}</div>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-lg-2 col-form-label">Alasan Tidak Hadir <span class="text-danger">*</span></label>
-                            <div class="col-md-9 col-lg-4">
-                                <textarea name="note" class="form-control {{ $errors->has('note') ? 'is-invalid' : '' }}" rows="3">{{ $absent->note }}</textarea>
-                                @if($errors->has('note'))
-                                <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('note')) }}</div>
                                 @endif
                             </div>
                         </div>

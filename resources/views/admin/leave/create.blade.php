@@ -1,25 +1,25 @@
 @extends('template/main')
 
-@section('title', 'Input Ketidakhadiran')
+@section('title', 'Input Cuti')
 
 @section('content')
 
 <main class="app-content">
     <div class="app-title">
         <div>
-            <h1><i class="fa fa-clipboard"></i> Input Ketidakhadiran</h1>
+            <h1><i class="fa fa-clipboard"></i> Input Cuti</h1>
         </div>
         <ul class="app-breadcrumb breadcrumb">
             <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.absent.index') }}">Ketidakhadiran</a></li>
-            <li class="breadcrumb-item">Input Ketidakhadiran</li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.leave.index') }}">Cuti</a></li>
+            <li class="breadcrumb-item">Input Cuti</li>
         </ul>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="tile">
-                <form method="post" action="{{ route('admin.absent.store') }}">
+                <form method="post" action="{{ route('admin.leave.store') }}">
                     @csrf
                     <div class="tile-body">
                         <div class="form-group row">
@@ -97,33 +97,11 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-md-3 col-lg-2 col-form-label">Tanggal Tidak Hadir <span class="text-danger">*</span></label>
+                            <label class="col-md-3 col-lg-2 col-form-label">Tanggal Cuti <span class="text-danger">*</span></label>
                             <div class="col-md-9 col-lg-4">
                                 <input type="text" name="date" class="form-control datepicker {{ $errors->has('date') ? 'is-invalid' : '' }}" value="{{ old('date') }}" placeholder="Format: dd/mm/yyyy" autocomplete="off">
                                 @if($errors->has('date'))
                                 <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('date')) }}</div>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-lg-2 col-form-label">Tidak Hadir Kenapa? <span class="text-danger">*</span></label>
-                            <div class="col-md-9 col-lg-4">
-                                <select name="category_id" class="form-control {{ $errors->has('category_id') ? 'is-invalid' : '' }}">
-                                    <option value="" selected>--Pilih--</option>
-                                    <option value="1" {{ old('category_id') == 1 ? 'selected' : '' }}>Sakit</option>
-                                    <option value="2" {{ old('category_id') == 2 ? 'selected' : '' }}>Izin</option>
-                                </select>
-                                @if($errors->has('category_id'))
-                                <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('category_id')) }}</div>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-lg-2 col-form-label">Alasan Tidak Hadir <span class="text-danger">*</span></label>
-                            <div class="col-md-9 col-lg-4">
-                                <textarea name="note" class="form-control {{ $errors->has('note') ? 'is-invalid' : '' }}" rows="3">{{ old('note') }}</textarea>
-                                @if($errors->has('note'))
-                                <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('note')) }}</div>
                                 @endif
                             </div>
                         </div>

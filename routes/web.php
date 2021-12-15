@@ -39,6 +39,14 @@ Route::group(['middleware' => ['admin']], function(){
 	Route::post('/admin/absent/update', 'AbsentController@update')->name('admin.absent.update');
 	Route::post('/admin/absent/delete', 'AbsentController@delete')->name('admin.absent.delete');
 
+    // Leave
+	Route::get('/admin/leave', 'LeaveController@index')->name('admin.leave.index');
+	Route::get('/admin/leave/create', 'LeaveController@create')->name('admin.leave.create');
+	Route::post('/admin/leave/store', 'LeaveController@store')->name('admin.leave.store');
+	Route::get('/admin/leave/edit/{id}', 'LeaveController@edit')->name('admin.leave.edit');
+	Route::post('/admin/leave/update', 'LeaveController@update')->name('admin.leave.update');
+	Route::post('/admin/leave/delete', 'LeaveController@delete')->name('admin.leave.delete');
+
 	// User
 	Route::get('/admin/user', 'UserController@index')->name('admin.user.index');
 	Route::get('/admin/user/create', 'UserController@create')->name('admin.user.create');
