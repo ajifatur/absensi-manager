@@ -70,6 +70,9 @@
                         <li class="nav-item" role="presentation">
                             <a class="nav-link {{ $category == 4 ? 'active' : '' }}" href="{{ route('admin.attendance.detail', ['id' => $user->id, 'category' => 4, 't1' => date('d/m/Y', strtotime($t1)), 't2' => date('d/m/Y', strtotime($t2))]) }}" role="tab" aria-selected="false">Izin <span class="badge badge-warning">{{ $count[4] }}</span></a>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link {{ $category == 5 ? 'active' : '' }}" href="{{ route('admin.attendance.detail', ['id' => $user->id, 'category' => 5, 't1' => date('d/m/Y', strtotime($t1)), 't2' => date('d/m/Y', strtotime($t2))]) }}" role="tab" aria-selected="false">Cuti <span class="badge badge-warning">{{ $count[5] }}</span></a>
+                        </li>
                     </ul>
                     <div class="tab-content py-3" id="myTabContent">
                         <div class="tab-pane fade show active" role="tabpanel">
@@ -158,7 +161,7 @@
                                             <tr>
                                                 <td align="center"><input type="checkbox"></td>
                                                 <td>
-                                                    <span class="d-none">{{ date('Y-m-d', strtotime($attendance->entry_at)).' '.$attendance->start_at }}</span>
+                                                    <span class="d-none">{{ $attendance->date }}</span>
                                                     {{ date('d/m/Y', strtotime($attendance->date)) }}
                                                 </td>
                                                 <td>{!! nl2br($attendance->note) !!}</td>
@@ -166,6 +169,33 @@
                                                     <div class="btn-group">
                                                         <a href="{{ route('admin.absent.edit', ['id' => $attendance->id]) }}" class="btn btn-warning btn-sm" title="Edit"><i class="fa fa-edit"></i></a>
                                                         <a href="#" class="btn btn-danger btn-sm btn-delete-absent" data-id="{{ $attendance->id }}" title="Hapus"><i class="fa fa-trash"></i></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                @elseif($category == 5)
+                                <table class="table table-sm table-hover table-bordered" id="table">
+                                    <thead>
+                                        <tr>
+                                            <th width="20"></th>
+                                            <th>Tanggal Cuti</th>
+                                            <th width="40">Opsi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($attendances as $attendance)
+                                            <tr>
+                                                <td align="center"><input type="checkbox"></td>
+                                                <td>
+                                                    <span class="d-none">{{ $attendance->date }}</span>
+                                                    {{ date('d/m/Y', strtotime($attendance->date)) }}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a href="{{ route('admin.leave.edit', ['id' => $attendance->id]) }}" class="btn btn-warning btn-sm" title="Edit"><i class="fa fa-edit"></i></a>
+                                                        <a href="#" class="btn btn-danger btn-sm btn-delete-leave" data-id="{{ $attendance->id }}" title="Hapus"><i class="fa fa-trash"></i></a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -188,6 +218,11 @@
 </form>
 
 <form id="form-delete-absent" class="d-none" method="post" action="{{ route('admin.absent.delete') }}">
+    @csrf
+    <input type="hidden" name="id">
+</form>
+
+<form id="form-delete-leave" class="d-none" method="post" action="{{ route('admin.leave.delete') }}">
     @csrf
     <input type="hidden" name="id">
 </form>
@@ -229,6 +264,17 @@
         if(ask){
             $("#form-delete-absent input[name=id]").val(id);
             $("#form-delete-absent").submit();
+        }
+    });
+
+    // Button Delete Leave
+    $(document).on("click", ".btn-delete-leave", function(e){
+        e.preventDefault();
+        var id = $(this).data("id");
+        var ask = confirm("Anda yakin ingin menghapus data ini?");
+        if(ask){
+            $("#form-delete-leave input[name=id]").val(id);
+            $("#form-delete-leave").submit();
         }
     });
 

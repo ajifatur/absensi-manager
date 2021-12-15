@@ -100,7 +100,9 @@
                                         <td align="right">
                                             <a href="{{ route('admin.attendance.detail', ['id' => $user->id, 'category' => 4, 't1' => date('d/m/Y', strtotime($t1)), 't2' => date('d/m/Y', strtotime($t2))]) }}">{{ number_format($user->absent2,0,',',',') }}</a>
                                         </td>
-                                        <td align="right">0</td>
+                                        <td align="right">
+                                            <a href="{{ route('admin.attendance.detail', ['id' => $user->id, 'category' => 5, 't1' => date('d/m/Y', strtotime($t1)), 't2' => date('d/m/Y', strtotime($t2))]) }}">{{ number_format($user->leave,0,',',',') }}</a>
+                                        </td>
                                         <td align="center">
                                             <div class="btn-group">
                                                 <a href="{{ route('admin.attendance.detail', ['id' => $user->id, 'category' => 1, 't1' => date('d/m/Y', strtotime($t1)), 't2' => date('d/m/Y', strtotime($t2))]) }}" class="btn btn-info btn-sm" title="Detail"><i class="fa fa-list"></i></a>

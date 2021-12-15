@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Ajifatur\Helpers\Date;
 use App\Models\Attendance;
 use App\Models\Absent;
+use App\Models\Leave;
 use App\Models\User;
 use App\Models\Group;
 use App\Models\WorkHour;
@@ -120,6 +121,9 @@ class AttendanceController extends Controller
                 // Set absents
                 $users[$key]->absent1 = Absent::where('user_id','=',$user->id)->where('category_id','=',1)->where('date','>=',$t1)->where('date','<=',$t2)->count();
                 $users[$key]->absent2 = Absent::where('user_id','=',$user->id)->where('category_id','=',2)->where('date','>=',$t1)->where('date','<=',$t2)->count();
+
+                // Set leaves
+                $users[$key]->leave = Leave::where('user_id','=',$user->id)->where('date','>=',$t1)->where('date','<=',$t2)->count();
 
                 // Get the work hours
                 $users[$key]->workhours = WorkHour::where('group_id','=',$user->group_id)->where('office_id','=',$user->office_id)->where('position_id','=',$user->position_id)->orderBy('name','asc')->get();
@@ -269,9 +273,14 @@ class AttendanceController extends Controller
             if($category == 3) $attendances = $absents1;
             if($category == 4) $attendances = $absents2;
 
+            // Get leaves
+            $leaves = Leave::where('user_id','=',$user->id)->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
+            if($category == 5) $attendances = $leaves;
+
             // Count absents
             $count[3] = count($absents1);
             $count[4] = count($absents2);
+            $count[5] = count($leaves);
 
             // View
             return view('admin/attendance/detail', [
