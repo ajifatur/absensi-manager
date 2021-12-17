@@ -27,11 +27,11 @@ class GroupController extends Controller
         }
 
         // Get groups
-        if(Auth::user()->role == role('super-admin'))
+        if(Auth::user()->role_id == role('super-admin'))
             $groups = Group::all();
-        elseif(Auth::user()->role == role('admin'))
+        elseif(Auth::user()->role_id == role('admin'))
             $groups = Group::where('id','=',Auth::user()->group_id)->get();
-        elseif(Auth::user()->role == role('manager'))
+        elseif(Auth::user()->role_id == role('manager'))
             abort(403);
 
         // View
@@ -94,6 +94,8 @@ class GroupController extends Controller
      */
     public function detail($id)
     {
+        abort(403);
+
         // Get the group
         $group = Group::findOrFail($id);
 

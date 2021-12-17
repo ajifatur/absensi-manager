@@ -1,45 +1,39 @@
-@extends('template/main')
+@extends('faturhelper::layouts/admin/main')
 
-@section('title', 'Tambah Grup')
+@section('title', 'Tambah Perusahaan')
 
 @section('content')
 
-<main class="app-content">
-    <div class="app-title">
-        <div>
-            <h1><i class="fa fa-dot-circle-o"></i> Tambah Grup</h1>
-        </div>
-        <ul class="app-breadcrumb breadcrumb">
-            <li class="breadcrumb-item"><i class="fa fa-home fa-lg"></i></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.group.index') }}">Grup</a></li>
-            <li class="breadcrumb-item">Tambah Grup</li>
-        </ul>
-    </div>
-    <div class="row">
-        <div class="col-lg-6 mx-auto">
-            <div class="tile">
-                <form method="post" action="{{ route('admin.group.store') }}">
+<div class="d-sm-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Tambah Perusahaan</h1>
+</div>
+<div class="row">
+	<div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" action="{{ route('admin.group.store') }}" enctype="multipart/form-data">
                     @csrf
-                    <div class="tile-title-w-btn">
-                        <h3 class="title">Tambah Grup</h3>
-                        <p><button class="btn btn-primary icon-btn" type="submit"><i class="fa fa-save mr-2"></i>Simpan</button></p>
-                    </div>
-                    <div class="tile-body">
-                        <div class="row">
-                            <div class="form-group col-md-12">
-                                <label>Nama <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}" value="{{ old('name') }}" placeholder="Masukkan Nama Grup">
-                                @if($errors->has('name'))
-                                <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('name')) }}</div>
-                                @endif
-                            </div>
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Nama <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <input type="text" name="name" class="form-control form-control-sm {{ $errors->has('name') ? 'border-danger' : '' }}" value="{{ old('name') }}" autofocus>
+                            @if($errors->has('name'))
+                            <div class="small text-danger">{{ $errors->first('name') }}</div>
+                            @endif
                         </div>
                     </div>
-                    <div class="tile-footer"><button class="btn btn-primary icon-btn" type="submit"><i class="fa fa-save mr-2"></i>Simpan</button></div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3"></div>
+                        <div class="col-lg-10 col-md-9">
+                            <button type="submit" class="btn btn-sm btn-primary"><i class="bi-save me-1"></i> Submit</button>
+                            <a href="{{ route('admin.group.index') }}" class="btn btn-sm btn-secondary"><i class="bi-arrow-left me-1"></i> Kembali</a>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
-    </div>
-</main>
+	</div>
+</div>
 
 @endsection

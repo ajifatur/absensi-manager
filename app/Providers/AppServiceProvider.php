@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use File;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +14,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        if(File::exists(base_path('vendor/ajifatur/faturhelper/src'))){
+            foreach(glob(base_path('vendor/ajifatur/faturhelper/src').'/HelpersExt/*.php') as $filename){
+                require_once $filename;
+            }
+        }
     }
 
     /**
