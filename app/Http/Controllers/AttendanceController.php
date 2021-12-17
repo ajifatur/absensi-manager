@@ -6,7 +6,7 @@ use Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Ajifatur\Helpers\Date;
+use Ajifatur\Helpers\DateTimeExt;
 use App\Models\Attendance;
 use App\Models\Absent;
 use App\Models\Leave;
@@ -24,12 +24,12 @@ class AttendanceController extends Controller
      */
     public function index(Request $request)
     {
-        if(Auth::user()->role == role('super-admin')){
+        if(Auth::user()->role_id == role('super-admin')) {
             // Set params
             $group = $request->query('group') != null ? $request->query('group') : 0;
             $office = $request->query('office') != null ? $request->query('office') : 0;
-            $t1 = $request->query('t1') != null ? Date::change($request->query('t1')) : date('Y-m-d');
-            $t2 = $request->query('t2') != null ? Date::change($request->query('t2')) : date('Y-m-d');
+            $t1 = $request->query('t1') != null ? DateTimeExt::change($request->query('t1')) : date('Y-m-d');
+            $t2 = $request->query('t2') != null ? DateTimeExt::change($request->query('t2')) : date('Y-m-d');
 
             // Get attendances
             if($group != 0 && $office != 0)
@@ -44,7 +44,7 @@ class AttendanceController extends Controller
                 $attendances = Attendance::whereDate('date','>=',$t1)->whereDate('date','<=',$t2)->orderBy('date','asc')->orderBy('start_at','asc')->get();
 
             // Get groups
-            $groups = Group::all();
+            $groups = Group::orderBy('name','asc')->get();
 
             // View
             return view('admin/attendance/index', [
@@ -52,12 +52,12 @@ class AttendanceController extends Controller
                 'groups' => $groups,
             ]);
         }
-        elseif(Auth::user()->role == role('admin') || Auth::user()->role == role('manager')){
+        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
             // Set params
             $group = Auth::user()->group_id;
             $office = $request->query('office') != null ? $request->query('office') : 0;
-            $t1 = $request->query('t1') != null ? Date::change($request->query('t1')) : date('Y-m-d');
-            $t2 = $request->query('t2') != null ? Date::change($request->query('t2')) : date('Y-m-d');
+            $t1 = $request->query('t1') != null ? DateTimeExt::change($request->query('t1')) : date('Y-m-d');
+            $t2 = $request->query('t2') != null ? DateTimeExt::change($request->query('t2')) : date('Y-m-d');
 
             // Get attendances
             if($office != 0)
@@ -87,32 +87,32 @@ class AttendanceController extends Controller
         // Set params
         $dt1 = date('m') > 1 ? date('Y-m-d', strtotime(date('Y').'-'.(date('m')-1).'-24')) : date('Y-m-d', strtotime((date('Y')-1).'-12-24'));
         $dt2 = date('Y-m-d', strtotime(date('Y').'-'.date('m').'-23'));
-        $t1 = $request->query('t1') != null ? Date::change($request->query('t1')) : $dt1;
-        $t2 = $request->query('t2') != null ? Date::change($request->query('t2')) : $dt2;
+        $t1 = $request->query('t1') != null ? DateTimeExt::change($request->query('t1')) : $dt1;
+        $t2 = $request->query('t2') != null ? DateTimeExt::change($request->query('t2')) : $dt2;
 
-        if(Auth::user()->role == role('super-admin')){
+        if(Auth::user()->role_id == role('super-admin')){
             // Set params
             $group = $request->query('group') != null ? $request->query('group') : 0;
             $office = $request->query('office') != null ? $request->query('office') : 0;
 
             // Get users
             if($group != 0 && $office != 0)
-                $users = User::where('role','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->where('office_id','=',$office)->get();
+                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->where('office_id','=',$office)->get();
             elseif($group != 0 && $office == 0)
-                $users = User::where('role','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->get();
+                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->get();
             else
-                $users = User::where('role','=',role('member'))->where('end_date','=',null)->get();
+                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->get();
         }
-        elseif(Auth::user()->role == role('admin') || Auth::user()->role == role('manager')) {
+        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
             // Set params
             $group = Auth::user()->group_id;
             $office = $request->query('office') != null ? $request->query('office') : 0;
 
             // Get users
             if($office != 0)
-                $users = User::where('role','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->where('office_id','=',$office)->get();
+                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->where('office_id','=',$office)->get();
             else
-                $users = User::where('role','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->get();
+                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->get();
         }
 
         // Set users attendances and absents
@@ -149,7 +149,7 @@ class AttendanceController extends Controller
         }
 
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/attendance/summary', [
@@ -168,7 +168,7 @@ class AttendanceController extends Controller
     public function create()
     {
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/attendance/create', [
@@ -186,7 +186,7 @@ class AttendanceController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'group_id' => Auth::user()->role == role('super-admin') ? 'required' : '',
+            'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
             'office_id' => 'required',
             'user_id' => 'required',
             'workhour_id' => 'required',
@@ -210,9 +210,9 @@ class AttendanceController extends Controller
             $attendance->workhour_id = $request->workhour_id;
             $attendance->start_at = $work_hour->start_at;
             $attendance->end_at = $work_hour->end_at;
-            $attendance->date = Date::change($request->date);
-            $attendance->entry_at = Date::change($request->entry_at[0]).' '.$request->entry_at[1].':00';
-            $attendance->exit_at = $request->exit_at[0] && $request->exit_at[1] != '' ? Date::change($request->exit_at[0]).' '.$request->exit_at[1].':00' : null;
+            $attendance->date = DateTimeExt::change($request->date);
+            $attendance->entry_at = DateTimeExt::change($request->entry_at[0]).' '.$request->entry_at[1].':00';
+            $attendance->exit_at = $request->exit_at[0] && $request->exit_at[1] != '' ? DateTimeExt::change($request->exit_at[0]).' '.$request->exit_at[1].':00' : null;
             $attendance->late = $request->late;
             $attendance->save();
 
@@ -237,10 +237,10 @@ class AttendanceController extends Controller
         // Set params
         $category = $request->query('category') != null ? $request->query('category') : 1;
         $workhour = $request->query('workhour') != null ? $request->query('workhour') : 0;
-        $t1 = $request->query('t1') != null ? Date::change($request->query('t1')) : $dt1;
-        $t2 = $request->query('t2') != null ? Date::change($request->query('t2')) : $dt2;
+        $t1 = $request->query('t1') != null ? DateTimeExt::change($request->query('t1')) : $dt1;
+        $t2 = $request->query('t2') != null ? DateTimeExt::change($request->query('t2')) : $dt2;
 
-        if(Auth::user()->role != role('member')) {
+        if(Auth::user()->role_id != role('member')) {
             // Get the user
             $user = User::findOrFail($id);
 
@@ -321,12 +321,16 @@ class AttendanceController extends Controller
         // Get the attendance
         $attendance = Attendance::findOrFail($id);
 
+        // Get groups
+        $groups = Group::orderBy('name','asc')->get();
+
         // Get work hours
         $work_hours = WorkHour::where('office_id','=',$attendance->user->office_id)->where('position_id','=',$attendance->user->position_id)->get();
 
         // View
         return view('admin/attendance/edit', [
             'attendance' => $attendance,
+            'groups' => $groups,
             'work_hours' => $work_hours,
         ]);
     }
@@ -360,9 +364,9 @@ class AttendanceController extends Controller
             $attendance->workhour_id = $request->workhour_id;
             $attendance->start_at = $work_hour->start_at;
             $attendance->end_at = $work_hour->end_at;
-            $attendance->date = Date::change($request->date);
-            $attendance->entry_at = Date::change($request->entry_at[0]).' '.$request->entry_at[1].':00';
-            $attendance->exit_at = $request->exit_at[0] && $request->exit_at[1] != '' ? Date::change($request->exit_at[0]).' '.$request->exit_at[1].':00' : null;
+            $attendance->date = DateTimeExt::change($request->date);
+            $attendance->entry_at = DateTimeExt::change($request->entry_at[0]).' '.$request->entry_at[1].':00';
+            $attendance->exit_at = $request->exit_at[0] && $request->exit_at[1] != '' ? DateTimeExt::change($request->exit_at[0]).' '.$request->exit_at[1].':00' : null;
             $attendance->late = $request->late;
             $attendance->save();
 
@@ -387,74 +391,5 @@ class AttendanceController extends Controller
 
         // Redirect
         return redirect()->route('admin.attendance.index')->with(['message' => 'Berhasil menghapus data.']);
-    }
-
-    /**
-     * Do the entry absence.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function entry(Request $request)
-    {
-        // Get the work hour
-        $work_hour = WorkHour::find($request->id);
-		
-		// Entry at
-		$entry_at = date('Y-m-d H:i:s');
-        
-        // If start_at and end_at are still at the same day
-        if(strtotime($work_hour->start_at) <= strtotime($work_hour->end_at)) {
-            $date = date('Y-m-d', strtotime($entry_at));
-        }
-        // If start_at and end_at are at the different day
-        else {
-            // If the user attends at 1 hour before work time
-            if(date('G', strtotime($entry_at)) >= (date('G', strtotime($work_hour->start_at)) - 1)) {
-                $date = date('Y-m-d', strtotime("+1 day"));
-            }
-            // If the user attends at 1 hour after work time
-            elseif(date('G', strtotime($entry_at)) <= (date('G', strtotime($work_hour->end_at)) + 1)) {
-                $date = date('Y-m-d', strtotime($entry_at));
-            }
-        }
-		
-		// Check absence
-		$check = Attendance::where('user_id','=',Auth::user()->id)->where('workhour_id','=',$request->id)->where('office_id','=',Auth::user()->office_id)->where('date','=',$date)->whereTime('entry_at','>=',date('H:i', strtotime($entry_at)).":00")->whereTime('entry_at','<=',date('H:i', strtotime($entry_at)).":59")->first();
-
-        // Entry absence
-		if(!$check) {
-			$attendance = new Attendance;
-			$attendance->user_id = Auth::user()->id;
-			$attendance->workhour_id = $request->id;
-			$attendance->office_id = Auth::user()->office_id;
-			$attendance->start_at = $work_hour->start_at;
-			$attendance->end_at = $work_hour->end_at;
-			$attendance->date = $date;
-			$attendance->entry_at = $entry_at;
-			$attendance->exit_at = null;
-            $attendance->late = '';
-			$attendance->save();
-		}
-
-        // Redirect
-        return redirect()->route('member.dashboard')->with(['message' => 'Berhasil melakukan absensi masuk.']);
-    }
-
-    /**
-     * Do the exit absence.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function exit(Request $request)
-    {
-        // Get the attendance
-        $attendance = Attendance::find($request->id);
-        $attendance->exit_at = date('Y-m-d H:i:s');
-        $attendance->save();
-
-        // Redirect
-        return redirect()->route('member.dashboard')->with(['message' => 'Berhasil melakukan absensi keluar.']);
     }
 }

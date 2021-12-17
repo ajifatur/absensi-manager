@@ -6,7 +6,7 @@ use Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Ajifatur\Helpers\Date;
+use Ajifatur\Helpers\DateTimeExt;
 use App\Models\Leave;
 use App\Models\Group;
 
@@ -21,9 +21,9 @@ class LeaveController extends Controller
     public function index(Request $request)
     {
         // Get leaves
-        if(Auth::user()->role == role('super-admin'))
+        if(Auth::user()->role_id == role('super-admin'))
             $leaves = Leave::has('user')->orderBy('date','desc')->get();
-        elseif(Auth::user()->role == role('admin') || Auth::user()->role == role('manager')) {
+        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
             $group = Auth::user()->group_id;
             $leaves = Leave::has('user')->whereHas('user', function (Builder $query) use ($group) {
                 return $query->where('group_id','=',$group);
@@ -44,7 +44,7 @@ class LeaveController extends Controller
     public function create()
     {
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/leave/create', [
@@ -62,7 +62,7 @@ class LeaveController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'group_id' => Auth::user()->role == role('super-admin') ? 'required' : '',
+            'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
             'office_id' => 'required',
             'user_id' => 'required',
             'date' => 'required',
@@ -77,7 +77,7 @@ class LeaveController extends Controller
             // Save the leave
             $leave = new Leave;
             $leave->user_id = $request->user_id;
-            $leave->date = Date::change($request->date);
+            $leave->date = DateTimeExt::change($request->date);
             $leave->save();
 
             // Redirect
@@ -96,9 +96,13 @@ class LeaveController extends Controller
         // Get the leave
         $leave = Leave::findOrFail($id);
 
+        // Get groups
+        $groups = Group::orderBy('name','asc')->get();
+
         // View
         return view('admin/leave/edit', [
             'leave' => $leave,
+            'groups' => $groups,
         ]);
     }
 
@@ -123,7 +127,7 @@ class LeaveController extends Controller
         else {
             // Update the leave
             $leave = Leave::find($request->id);
-            $leave->date = Date::change($request->date);
+            $leave->date = DateTimeExt::change($request->date);
             $leave->save();
 
             // Redirect

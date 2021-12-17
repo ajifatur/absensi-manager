@@ -25,7 +25,9 @@
                                 <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
                                 <th>Nama</th>
                                 <th width="80">Karyawan</th>
-                                <th width="150">Grup</th>
+                                @if(Auth::user()->role_id == role('super-admin'))
+                                <th width="150">Perusahaan</th>
+                                @endif
                                 <th width="40">Opsi</th>
                             </tr>
                         </thead>
@@ -35,11 +37,13 @@
                                 <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
                                 <td><a href="{{ route('admin.office.detail', ['id' => $office->id]) }}">{{ $office->name }}</a></td>
                                 <td align="right">{{ number_format($office->users()->where('role_id','=',role('member'))->where('end_date','=',null)->count(),0,',',',') }}</td>
+                                @if(Auth::user()->role_id == role('super-admin'))
                                 <td>
                                     @if($office->group)
                                         <a href="{{ route('admin.group.detail', ['id' => $office->group->id]) }}">{{ $office->group->name }}</a>
                                     @endif
                                 </td>
+                                @endif
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('admin.office.edit', ['id' => $office->id]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="bi-pencil"></i></a>

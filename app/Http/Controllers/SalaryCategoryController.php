@@ -28,10 +28,10 @@ class SalaryCategoryController extends Controller
         }
 
         // Get salary categories
-        if(Auth::user()->role == role('super-admin'))
-            $salary_categories = SalaryCategory::has('group')->get();
-        elseif(Auth::user()->role == role('admin') || Auth::user()->role == role('manager'))
-            $salary_categories = SalaryCategory::has('group')->where('group_id','=',Auth::user()->group_id)->get();
+        if(Auth::user()->role_id == role('super-admin'))
+            $salary_categories = SalaryCategory::has('group')->orderBy('group_id','asc')->get();
+        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
+            $salary_categories = SalaryCategory::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('group_id','asc')->get();
 
         // View
         return view('admin/salary-category/index', [
@@ -47,7 +47,7 @@ class SalaryCategoryController extends Controller
     public function create()
     {
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/salary-category/create', [
@@ -65,7 +65,7 @@ class SalaryCategoryController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'group_id' => Auth::user()->role == role('super-admin') ? 'required' : '',
+            'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
             'position_id' => 'required',
             'name' => 'required|max:255',
             'type_id' => 'required',
@@ -79,7 +79,7 @@ class SalaryCategoryController extends Controller
         else{
             // Save the salary category
             $salary_category = new SalaryCategory;
-            $salary_category->group_id = Auth::user()->role == role('super-admin') ? $request->group_id : Auth::user()->group_id;
+            $salary_category->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $salary_category->position_id = $request->position_id;
             $salary_category->name = $request->name;
             $salary_category->type_id = $request->type_id;
@@ -102,7 +102,7 @@ class SalaryCategoryController extends Controller
         $salary_category = SalaryCategory::findOrFail($id);
 
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/salary-category/edit', [

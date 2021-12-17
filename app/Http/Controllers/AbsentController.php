@@ -6,7 +6,7 @@ use Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Ajifatur\Helpers\Date;
+use Ajifatur\Helpers\DateTimeExt;
 use App\Models\Absent;
 use App\Models\Group;
 
@@ -21,9 +21,9 @@ class AbsentController extends Controller
     public function index(Request $request)
     {
         // Get absents
-        if(Auth::user()->role == role('super-admin'))
+        if(Auth::user()->role_id == role('super-admin'))
             $absents = Absent::has('user')->orderBy('date','desc')->get();
-        elseif(Auth::user()->role == role('admin') || Auth::user()->role == role('manager')) {
+        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
             $group = Auth::user()->group_id;
             $absents = Absent::has('user')->whereHas('user', function (Builder $query) use ($group) {
                 return $query->where('group_id','=',$group);
@@ -44,7 +44,7 @@ class AbsentController extends Controller
     public function create()
     {
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/absent/create', [
@@ -62,7 +62,7 @@ class AbsentController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'group_id' => Auth::user()->role == role('super-admin') ? 'required' : '',
+            'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
             'office_id' => 'required',
             'user_id' => 'required',
             'date' => 'required',
@@ -80,7 +80,7 @@ class AbsentController extends Controller
             $absent = new Absent;
             $absent->user_id = $request->user_id;
             $absent->category_id = $request->category_id;
-            $absent->date = Date::change($request->date);
+            $absent->date = DateTimeExt::change($request->date);
             $absent->note = $request->note;
             $absent->attachment = '';
             $absent->save();
@@ -101,9 +101,13 @@ class AbsentController extends Controller
         // Get the absent
         $absent = Absent::findOrFail($id);
 
+        // Get groups
+        $groups = Group::orderBy('name','asc')->get();
+
         // View
         return view('admin/absent/edit', [
             'absent' => $absent,
+            'groups' => $groups,
         ]);
     }
 
@@ -131,7 +135,7 @@ class AbsentController extends Controller
             // Update the absent
             $absent = Absent::find($request->id);
             $absent->category_id = $request->category_id;
-            $absent->date = Date::change($request->date);
+            $absent->date = DateTimeExt::change($request->date);
             $absent->note = $request->note;
             $absent->save();
 

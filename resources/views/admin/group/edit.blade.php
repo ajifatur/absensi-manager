@@ -1,6 +1,6 @@
 @extends('faturhelper::layouts/admin/main')
 
-@section('title', 'Edit Perusahaan')
+@section('title', 'Edit Perusahaan: '.$group->name)
 
 @section('content')
 

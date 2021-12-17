@@ -27,10 +27,10 @@ class PositionController extends Controller
         }
 
         // Get positions
-        if(Auth::user()->role == role('super-admin'))
-            $positions = Position::has('group')->get();
-        elseif(Auth::user()->role == role('admin') || Auth::user()->role == role('manager'))
-            $positions = Position::has('group')->where('group_id','=',Auth::user()->group_id)->get();
+        if(Auth::user()->role_id == role('super-admin'))
+            $positions = Position::has('group')->orderBy('group_id','asc')->get();
+        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
+            $positions = Position::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('group_id','asc')->get();
 
         // View
         return view('admin/position/index', [
@@ -46,7 +46,7 @@ class PositionController extends Controller
     public function create()
     {
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/position/create', [
@@ -65,7 +65,7 @@ class PositionController extends Controller
         // Validation
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'group_id' => Auth::user()->role == role('super-admin') ? 'required' : '',
+            'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
             // 'work_hours' => 'required'
         ]);
         
@@ -77,7 +77,7 @@ class PositionController extends Controller
         else{
             // Save the position
             $position = new Position;
-            $position->group_id = Auth::user()->role == role('super-admin') ? $request->group_id : Auth::user()->group_id;
+            $position->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $position->name = $request->name;
             $position->work_hours = 0;
             $position->save();
@@ -116,7 +116,7 @@ class PositionController extends Controller
         $position = Position::findOrFail($id);
 
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/position/edit', [
@@ -136,7 +136,7 @@ class PositionController extends Controller
         // Validation
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'group_id' => Auth::user()->role == role('super-admin') ? 'required' : '',
+            'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
             // 'work_hours' => 'required'
         ]);
         
@@ -148,7 +148,7 @@ class PositionController extends Controller
         else{
             // Update the position
             $position = Position::find($request->id);
-            $position->group_id = Auth::user()->role == role('super-admin') ? $request->group_id : Auth::user()->group_id;
+            $position->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $position->name = $request->name;
             // $position->work_hours = $request->work_hours;
             $position->save();

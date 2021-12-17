@@ -46,7 +46,7 @@ class OfficeController extends Controller
     public function create()
     {
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/office/create', [
@@ -65,7 +65,7 @@ class OfficeController extends Controller
         // Validation
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'group_id' => Auth::user()->role == role('super-admin') ? 'required' : '',
+            'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
         ]);
         
         // Check errors
@@ -76,7 +76,7 @@ class OfficeController extends Controller
         else{
             // Save the office
             $office = new Office;
-            $office->group_id = Auth::user()->role == role('super-admin') ? $request->group_id : Auth::user()->group_id;
+            $office->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $office->name = $request->name;
             $office->save();
 
@@ -114,7 +114,7 @@ class OfficeController extends Controller
         $office = Office::findOrFail($id);
 
         // Get groups
-        $groups = Group::all();
+        $groups = Group::orderBy('name','asc')->get();
 
         // View
         return view('admin/office/edit', [
@@ -134,7 +134,7 @@ class OfficeController extends Controller
         // Validation
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'group_id' => Auth::user()->role == role('super-admin') ? 'required' : '',
+            'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
         ]);
         
         // Check errors
@@ -145,7 +145,7 @@ class OfficeController extends Controller
         else{
             // Update the office
             $office = Office::find($request->id);
-            $office->group_id = Auth::user()->role == role('super-admin') ? $request->group_id : Auth::user()->group_id;
+            $office->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $office->name = $request->name;
             $office->save();
 
