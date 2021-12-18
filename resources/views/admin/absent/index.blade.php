@@ -52,8 +52,8 @@
                                 </td>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <td>
-                                    @if($absent->group)
-                                        <a href="{{ route('admin.group.detail', ['id' => $absent->group->id]) }}">{{ $absent->group->name }}</a>
+                                    @if($absent->user->group)
+                                        <a href="{{ route('admin.group.detail', ['id' => $absent->user->group->id]) }}">{{ $absent->user->group->name }}</a>
                                     @endif
                                 </td>
                                 @endif

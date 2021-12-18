@@ -42,8 +42,8 @@
                                 </td>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <td>
-                                    @if($leave->group)
-                                        <a href="{{ route('admin.group.detail', ['id' => $leave->group->id]) }}">{{ $leave->group->name }}</a>
+                                    @if($leave->user->group)
+                                        <a href="{{ route('admin.group.detail', ['id' => $leave->user->group->id]) }}">{{ $leave->user->group->name }}</a>
                                     @endif
                                 </td>
                                 @endif
