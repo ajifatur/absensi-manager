@@ -153,10 +153,9 @@ class UserController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'role' => Auth::user()->role_id == role('manager') ? '' : 'required',
             'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
-            'office_id' => !in_array($request->role, [role('admin'), role('manager')]) ? 'required' : '',
-            'position_id' => !in_array($request->role, [role('admin'), role('manager')]) ? 'required' : '',
+            'office_id' => !in_array($request->role_id, [role('admin'), role('manager')]) ? 'required' : '',
+            'position_id' => !in_array($request->role_id, [role('admin'), role('manager')]) ? 'required' : '',
             'name' => 'required|max:200',
             'birthdate' => 'required',
             'gender' => 'required',
@@ -177,10 +176,10 @@ class UserController extends Controller
         else{
             // Save the user
             $user = new User;
-            $user->role = Auth::user()->role_id == role('manager') ? role('member') : $request->role;
+            $user->role_id = Auth::user()->role_id == role('manager') ? role('member') : $request->role_id;
             $user->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
-            $user->office_id = !in_array($request->role, [role('admin'), role('manager')]) ? $request->office_id : 0;
-            $user->position_id = !in_array($request->role, [role('admin'), role('manager')]) ? $request->position_id : 0;
+            $user->office_id = !in_array($request->role_id, [role('admin'), role('manager')]) ? $request->office_id : 0;
+            $user->position_id = !in_array($request->role_id, [role('admin'), role('manager')]) ? $request->position_id : 0;
             $user->name = $request->name;
             $user->birthdate = Date::change($request->birthdate);
             $user->gender = $request->gender;
@@ -198,7 +197,7 @@ class UserController extends Controller
             $user->save();
 
             // Get the role
-            $role = Role::find($user->role);
+            $role = Role::find($user->role_id);
 
             // Redirect
             return redirect()->route('admin.user.index', ['role' => $role->code])->with(['message' => 'Berhasil menambah data.']);
@@ -257,9 +256,8 @@ class UserController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'role' => Auth::user()->role_id == role('manager') ? '' : 'required',
-            'office_id' => !in_array($request->role, [role('admin'), role('manager')]) ? 'required' : '',
-            'position_id' => !in_array($request->role, [role('admin'), role('manager')]) ? 'required' : '',
+            'office_id' => !in_array($request->role_id, [role('admin'), role('manager')]) ? 'required' : '',
+            'position_id' => !in_array($request->role_id, [role('admin'), role('manager')]) ? 'required' : '',
             'name' => 'required|max:200',
             'birthdate' => 'required',
             'gender' => 'required',
@@ -275,14 +273,13 @@ class UserController extends Controller
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
         else{
             // Update the user
             $user = User::find($request->id);
-            $user->role = Auth::user()->role_id == role('manager') ? role('member') : $request->role;
             $user->office_id = $request->office_id;
             $user->position_id = $request->position_id;
             $user->name = $request->name;
@@ -300,7 +297,7 @@ class UserController extends Controller
             $user->save();
 
             // Get the role
-            $role = Role::find($user->role);
+            $role = Role::find($user->role_id);
 
             // Redirect
             return redirect()->route('admin.user.index', ['role' => $role->code])->with(['message' => 'Berhasil mengupdate data.']);
@@ -387,7 +384,10 @@ class UserController extends Controller
         // Delete the user
         $user->delete();
 
+        // Get the role
+        $role = Role::find($user->role_id);
+
         // Redirect
-        return redirect()->route('admin.user.index')->with(['message' => 'Berhasil menghapus data.']);
+        return redirect()->route('admin.user.index', ['role' => $role->code])->with(['message' => 'Berhasil menghapus data.']);
     }
 }

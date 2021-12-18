@@ -76,7 +76,7 @@
                                 <option value="2" {{ $absent->category_id == 2 ? 'selected' : '' }}>Izin</option>
                             </select>
                             @if($errors->has('category_id'))
-                            <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('category_id')) }}</div>
+                            <div class="small text-danger">{{ ucfirst($errors->first('category_id')) }}</div>
                             @endif
                         </div>
                     </div>
@@ -85,7 +85,7 @@
                         <div class="col-lg-10 col-md-9">
                             <textarea name="note" class="form-control form-control-sm {{ $errors->has('note') ? 'border-danger' : '' }}" rows="3">{{ $absent->note }}</textarea>
                             @if($errors->has('note'))
-                            <div class="form-control-feedback text-danger">{{ ucfirst($errors->first('note')) }}</div>
+                            <div class="small text-danger">{{ ucfirst($errors->first('note')) }}</div>
                             @endif
                         </div>
                     </div>

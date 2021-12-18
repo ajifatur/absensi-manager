@@ -19,14 +19,14 @@
                 </div>
                 @endif
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover table-bordered" id="datatable">
+                    <table class="table table-sm table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
                                 <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
-                                <th>Kategori</th>
-                                <th width="100">Tipe</th>
-                                <th width="80">Indikator</th>
                                 <th width="150">Jabatan</th>
+                                <th>Kategori</th>
+                                <th width="150">Tipe</th>
+                                <th width="80">Indikator</th>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <th width="150">Perusahaan</th>
                                 @endif
@@ -37,6 +37,11 @@
                             @foreach($salary_categories as $category)
                             <tr>
                                 <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
+                                <td>
+                                    @if($category->position)
+                                        <a href="{{ route('admin.position.detail', ['id' => $category->position->id]) }}">{{ $category->position->name }}</a>
+                                    @endif
+                                </td>
                                 <td>{{ $category->name }}</td>
                                 <td>
                                     @if($category->type_id == 1) Manual
@@ -45,11 +50,6 @@
                                     @endif
                                 </td>
                                 <td>{{ number_format($category->indicators()->count(),0,',',',') }}</td>
-                                <td>
-                                    @if($category->position)
-                                        <a href="{{ route('admin.position.detail', ['id' => $category->position->id]) }}">{{ $category->position->name }}</a>
-                                    @endif
-                                </td>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <td>
                                     @if($category->group)
@@ -85,7 +85,8 @@
 
 <script type="text/javascript">
     // DataTable
-    Spandiv.DataTable("#datatable");
+    Spandiv.DataTableRowsGroup("#datatable", [1]);
+
     // Button Delete
     Spandiv.ButtonDelete(".btn-delete", ".form-delete");
     

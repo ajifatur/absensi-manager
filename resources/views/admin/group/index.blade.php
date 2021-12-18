@@ -41,12 +41,12 @@
                             <tr>
                                 <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
                                 <td><a href="{{ route('admin.group.detail', ['id' => $group->id]) }}">{{ $group->name }}</a></td>
-                                <td>{{ number_format($group->offices->count(),0,',',',') }}</td>
-                                <td>{{ number_format($group->positions->count(),0,',',',') }}</td>
-                                <td>{{ number_format($group->users()->where('role_id','=',role('admin'))->count(),0,',',',') }}</td>
-                                <td>{{ number_format($group->users()->where('role_id','=',role('manager'))->count(),0,',',',') }}</td>
-                                <td>{{ number_format($group->users()->where('role_id','=',role('member'))->where('end_date','=',null)->count(),0,',',',') }}</td>
-                                <td>{{ number_format($group->users()->where('role_id','=',role('member'))->where('end_date','!=',null)->count(),0,',',',') }}</td>
+                                <td align="right">{{ number_format($group->offices->count(),0,',',',') }}</td>
+                                <td align="right">{{ number_format($group->positions->count(),0,',',',') }}</td>
+                                <td align="right">{{ number_format($group->users()->where('role_id','=',role('admin'))->count(),0,',',',') }}</td>
+                                <td align="right">{{ number_format($group->users()->where('role_id','=',role('manager'))->count(),0,',',',') }}</td>
+                                <td align="right">{{ number_format($group->users()->where('role_id','=',role('member'))->where('end_date','=',null)->count(),0,',',',') }}</td>
+                                <td align="right">{{ number_format($group->users()->where('role_id','=',role('member'))->where('end_date','!=',null)->count(),0,',',',') }}</td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('admin.group.edit', ['id' => $group->id]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="bi-pencil"></i></a>

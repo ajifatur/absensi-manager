@@ -15,19 +15,15 @@ use Ajifatur\Helpers\RouteExt;
 */
 
 // Admin
-Route::group(['middleware' => ['admin']], function(){
-    // Logout
-	// Route::post('/admin/logout', 'LoginController@logout')->name('admin.logout');
-
-	// Dashboard
-	// Route::get('/admin', 'DashboardController@index')->name('admin.dashboard');
+Route::group(['middleware' => ['admin']], function() {
+	// Summary
+	Route::get('/admin/summary/attendance', 'SummaryAttendanceController@index')->name('admin.summary.attendance.index');
+	Route::get('/admin/summary/attendance/detail/{id}', 'SummaryAttendanceController@detail')->name('admin.summary.attendance.detail');
 
     // Attendance
 	Route::get('/admin/attendance', 'AttendanceController@index')->name('admin.attendance.index');
-	Route::get('/admin/attendance/summary', 'AttendanceController@summary')->name('admin.attendance.summary');
 	Route::get('/admin/attendance/create', 'AttendanceController@create')->name('admin.attendance.create');
 	Route::post('/admin/attendance/store', 'AttendanceController@store')->name('admin.attendance.store');
-	Route::get('/admin/attendance/detail/{id}', 'AttendanceController@detail')->name('admin.attendance.detail');
 	Route::get('/admin/attendance/edit/{id}', 'AttendanceController@edit')->name('admin.attendance.edit');
 	Route::post('/admin/attendance/update', 'AttendanceController@update')->name('admin.attendance.update');
 	Route::post('/admin/attendance/delete', 'AttendanceController@delete')->name('admin.attendance.delete');
@@ -106,7 +102,7 @@ Route::group(['middleware' => ['admin']], function(){
 });
 
 // Guest
-Route::group(['middleware' => ['guest']], function(){
+Route::group(['middleware' => ['guest']], function() {
     // Home
     Route::get('/', function () {
         return redirect()->route('auth.login');
