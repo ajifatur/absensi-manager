@@ -19,10 +19,7 @@ class Setting extends Model
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array  $attributes
-     * @return $this
-     *
-     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+     * @param  array
      */
     protected $fillable = ['name', 'category', 'rules', 'code', 'value'];
 

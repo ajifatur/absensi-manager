@@ -1,21 +1,17 @@
 @extends('faturhelper::layouts/admin/main')
 
-@section('title', 'Kelola '.role(role(Request::query('role'))))
+@section('title', 'Rekapitulasi Penggajian')
 
 @section('content')
 
 <div class="d-sm-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-2 mb-sm-0">Kelola {{ role(role(Request::query('role'))) }}</h1>
-    <a href="{{ route('admin.user.create', ['role' => Request::query('role')]) }}" class="btn btn-sm btn-primary"><i class="bi-plus me-1"></i> Tambah {{ role(role(Request::query('role'))) }}</a>
+    <h1 class="h3 mb-0">Rekapitulasi Penggajian</h1>
 </div>
 <div class="row">
     <div class="col-12">
         <div class="card">
-            
-            @if(Request::query('role') == 'member')
             <div class="card-header d-sm-flex justify-content-center align-items-center">
                 <form id="form-filter" class="d-lg-flex" method="get" action="">
-                    <input type="hidden" name="role" value="{{ Request::query('role') }}">
                     @if(Auth::user()->role_id == role('super-admin'))
                     <div class="mb-lg-0 mb-2">
                         <select name="group" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Perusahaan">
@@ -64,8 +60,7 @@
                 </form>
             </div>
             <hr class="my-0">
-            @endif
-
+            @if(Request::query('office') != null && Request::query('position') != null)
             <div class="card-body">
                 @if(Session::get('message'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -74,79 +69,59 @@
                 </div>
                 @endif
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover table-bordered" id="datatable">
+                    <table class="table table-sm table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
-                                <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
-                                <th>Identitas</th>
-                                @if(Request::query('role') == 'member')
-                                    <th width="80">Tanggal Kontrak</th>
-                                    <th width="150">Kantor</th>
-                                    <th width="150">Jabatan</th>
+                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
+                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}">Karyawan</th>
+                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Tanggal Kontrak</th>
+                                @if(count($categories) > 0)
+                                <th colspan="{{ count($categories) }}">Rincian Gaji Kotor</th>
+                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Total Gaji Kotor</th>
                                 @endif
-                                @if(Request::query('role') != 'member')
-                                <th width="100">Kunjungan Terakhir</th>
-                                @endif
-                                @if(Auth::user()->role_id == role('super-admin') && Request::query('group') == null)
-                                    <th width="150">Perusahaan</th>
-                                @endif
-                                <th width="40">Opsi</th>
+                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="40">Opsi</th>
                             </tr>
+                            @if(Request::query('office') != null && Request::query('position') != null && count($categories) > 0)
+                                <tr>
+                                    @foreach($categories as $category)
+                                    <th width="80">{{ $category->name }}</th>
+                                    @endforeach
+                                </tr>
+                            @endif
                         </thead>
                         <tbody>
                             @foreach($users as $user)
                                 <tr>
                                     <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
+                                    <td><a href="{{ route('admin.user.detail', ['id' => $user->id]) }}">{{ $user->name }}</a></td>
                                     <td>
-                                        <a href="{{ route('admin.user.detail', ['id' => $user->id]) }}">{{ $user->name }}</a>
-                                        <br>
-                                        <small class="text-dark">{{ $user->email }}</small>
-                                        <br>
-                                        <small class="text-muted">{{ $user->phone_number }}</small>
+                                        <span class="d-none">{{ $user->end_date == null ? 1 : 0 }} {{ $user->start_date }}</span>
+                                        {{ date('d/m/Y', strtotime($user->start_date)) }}
                                     </td>
-                                    @if(Request::query('role') == 'member')
-                                        <td>
-                                            <span class="d-none">{{ $user->end_date == null ? 1 : 0 }} {{ $user->start_date }}</span>
-                                            @if($user->end_date == null)
-                                                {{ date('d/m/Y', strtotime($user->start_date)) }}
-                                            @else
-                                                <span class="badge badge-danger">Tidak Aktif</span>
+                                    @if(count($user->salary) > 0)
+                                        @foreach($user->salary as $salary)
+                                        <td align="right">
+                                            <span class="amount-indicator" data-user="{{ $user->id }}" data-category="{{ $salary['category']->id }}">{{ number_format($salary['amount'],0,',',',') }}</span>
+                                            <hr class="my-1">
+                                            @if($salary['category']->type_id == 1)
+                                                <p class="text-start text-muted mb-0">Nilai:</p>
+                                                <input type="number" class="form-control form-control-sm user-indicator" data-user="{{ $user->id }}" data-category="{{ $salary['category']->id }}" value="{{ $salary['value'] }}">
+                                            @elseif($salary['category']->type_id == 2)
+                                                <p class="text-start text-muted mb-0">Masa Kerja:</p>
+                                                <p class="text-start text-success mb-0">{{ number_format($salary['value'],1,'.',',') }} bulan</p>
+                                            @elseif($salary['category']->type_id == 3)
+                                                <p class="text-start text-muted mb-0">Kehadiran:</p>
+                                                <p class="text-start text-success mb-0">{{ number_format($salary['value'],0,'.',',') }} kali</p>
                                             @endif
                                         </td>
-                                        <td>
-                                            @if($user->office)
-                                                <a href="{{ route('admin.office.detail', ['id' => $user->office->id]) }}">{{ $user->office->name }}</a>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($user->position)
-                                                <a href="{{ route('admin.position.detail', ['id' => $user->position->id]) }}">{{ $user->position->name }}</a>
-                                            @endif
-                                        </td>
-                                    @endif
-                                    @if(Request::query('role') != 'member')
-                                    <td>
-                                        <span class="d-none">{{ $user->last_visit }}</span>
-                                        {{ date('d/m/Y', strtotime($user->last_visit)) }}
-                                        <br>
-                                        <small class="text-muted">{{ date('H:i', strtotime($user->last_visit)) }} WIB</small>
-                                    </td>
-                                    @endif
-                                    @if(Auth::user()->role_id == role('super-admin') && Request::query('group') == null)
-                                        <td>
-                                            @if($user->group)
-                                                <a href="{{ route('admin.group.detail', ['id' => $user->group->id]) }}">{{ $user->group->name }}</a>
-                                            @endif
+                                        @endforeach
+                                        <td align="right">
+                                            <span class="subtotal-salary" data-user="{{ $user->id }}">{{ number_format($user->totalSalary,0,',',',') }}</span>
                                         </td>
                                     @endif
                                     <td align="center">
                                         <div class="btn-group">
-                                            <a href="{{ route('admin.user.edit', ['id' => $user->id]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="bi-pencil"></i></a>
-                                            @if(Auth::user()->role_id == role('super-admin'))
-                                            <a href="#" class="btn btn-sm btn-danger {{ $user->id > 1 ? 'btn-delete' : '' }}" data-id="{{ $user->id }}" style="{{ $user->id > 1 ? '' : 'cursor: not-allowed' }}" data-bs-toggle="tooltip" title="{{ $user->id <= 1 ? $user->id == Auth::user()->id ? 'Tidak dapat menghapus akun sendiri' : 'Akun ini tidak boleh dihapus' : 'Hapus' }}"><i class="bi-trash"></i></a>
-                                            @elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
-                                            <a href="#" class="btn btn-sm btn-danger {{ $user->id != Auth::user()->id ? 'btn-delete' : '' }}" data-id="{{ $user->id }}" style="{{ $user->id != Auth::user()->id ? '' : 'cursor: not-allowed' }}" data-bs-toggle="tooltip" title="{{ $user->id == Auth::user()->id ? 'Tidak dapat menghapus akun sendiri' : 'Hapus' }}"><i class="bi-trash"></i></a>
-                                            @endif
+                                            -
                                         </div>
                                     </td>
                                 </tr>
@@ -155,14 +130,10 @@
                     </table>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>
-
-<form class="form-delete d-none" method="post" action="{{ route('admin.user.delete') }}">
-    @csrf
-    <input type="hidden" name="id">
-</form>
 
 @endsection
 
@@ -171,12 +142,6 @@
 <script type="text/javascript">
     // DataTable
     Spandiv.DataTable("#datatable");
-
-    // Datepicker
-    Spandiv.DatePicker("input[name=t1], input[name=t2]");
-    
-    // Button Delete
-    Spandiv.ButtonDelete(".btn-delete", ".form-delete");
     
     // Checkbox
     Spandiv.CheckboxOne();
@@ -220,6 +185,23 @@
             $("#form-filter").find("button[type=submit]").removeAttr("disabled");
         else
             $("#form-filter").find("button[type=submit]").attr("disabled","disabled");
+    });
+
+    // Change the User Indicator
+    $(document).on("change", ".user-indicator", function() {
+        var user = $(this).data("user");
+        var category = $(this).data("category");
+        var value = $(this).val();
+        $.ajax({
+            type: "post",
+            url: "{{ route('admin.user.update-value') }}",
+            data: {_token: "{{ csrf_token() }}", user: user, category: category, value: value},
+            success: function(response) {
+                $(".amount-indicator[data-user=" + user + "][data-category=" + category + "]").text(response.amount);
+                $(".subtotal-salary[data-user=" + user + "]").text(response.total);
+                console.log(response);
+            }
+        });
     });
 </script>
 

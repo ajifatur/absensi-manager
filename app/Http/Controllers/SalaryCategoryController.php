@@ -78,11 +78,11 @@ class SalaryCategoryController extends Controller
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Save the salary category
             $salary_category = new SalaryCategory;
             $salary_category->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
@@ -133,11 +133,11 @@ class SalaryCategoryController extends Controller
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Update the salary category
             $salary_category = SalaryCategory::find($request->id);
             $salary_category->position_id = $request->position_id;

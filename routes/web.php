@@ -19,6 +19,7 @@ Route::group(['middleware' => ['admin']], function() {
 	// Summary
 	Route::get('/admin/summary/attendance', 'SummaryAttendanceController@index')->name('admin.summary.attendance.index');
 	Route::get('/admin/summary/attendance/detail/{id}', 'SummaryAttendanceController@detail')->name('admin.summary.attendance.detail');
+	Route::get('/admin/summary/salary', 'SummarySalaryController@index')->name('admin.summary.salary.index');
 
     // Attendance
 	Route::get('/admin/attendance', 'AttendanceController@index')->name('admin.attendance.index');
@@ -51,8 +52,7 @@ Route::group(['middleware' => ['admin']], function() {
 	Route::get('/admin/user/detail/{id}', 'UserController@detail')->name('admin.user.detail');
 	Route::get('/admin/user/edit/{id}', 'UserController@edit')->name('admin.user.edit');
 	Route::post('/admin/user/update', 'UserController@update')->name('admin.user.update');
-	Route::get('/admin/user/edit-indicator/{id}', 'UserController@editIndicator')->name('admin.user.edit-indicator');
-	Route::post('/admin/user/update-indicator', 'UserController@updateIndicator')->name('admin.user.update-indicator');
+	Route::post('/admin/user/update-value', 'UserController@updateValue')->name('admin.user.update-value');
 	Route::post('/admin/user/delete', 'UserController@delete')->name('admin.user.delete');
 
 	// Group

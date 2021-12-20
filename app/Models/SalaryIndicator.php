@@ -19,10 +19,7 @@ class SalaryIndicator extends Model
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array  $attributes
-     * @return $this
-     *
-     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+     * @param  array
      */
     protected $fillable = ['lower_range', 'upper_range', 'amount'];
     

@@ -19,7 +19,7 @@ class Leave extends Model
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array  $attributes
+     * @param  array
      */
     protected $fillable = ['date'];
     
