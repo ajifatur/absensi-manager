@@ -11,7 +11,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form method="post" action="{{ route('admin.position.store') }}" enctype="multipart/form-data">
+                <form method="post" action="{{ route('admin.position.update') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" value="{{ $position->id }}">
                     <div class="row mb-3">

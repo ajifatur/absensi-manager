@@ -32,10 +32,10 @@ class WorkHourController extends Controller
         // Get work hours
         if(Auth::user()->role_id == role('super-admin')) {
             $group = Group::find($request->query('group'));
-            $work_hours = $group ? WorkHour::has('group')->where('group_id','=',$group->id)->orderBy('group_id','asc')->get() : WorkHour::has('group')->orderBy('group_id','asc')->get();
+            $work_hours = $group ? WorkHour::has('group')->where('group_id','=',$group->id)->get() : WorkHour::has('group')->orderBy('group_id','asc')->get();
         }
         elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
-            $work_hours = WorkHour::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('group_id','asc')->get();
+            $work_hours = WorkHour::has('group')->where('group_id','=',Auth::user()->group_id)->get();
 
         // Get groups
         $groups = Group::orderBy('name','asc')->get();

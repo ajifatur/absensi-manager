@@ -79,6 +79,7 @@ class GroupController extends Controller
             $office = new Office;
             $office->group_id = $group->id;
             $office->name = 'Head Office';
+            $office->is_main = 1;
             $office->save();
 
             // Redirect

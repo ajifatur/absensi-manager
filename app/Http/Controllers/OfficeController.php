@@ -20,7 +20,7 @@ class OfficeController extends Controller
     {
         if($request->ajax()) {
             // Get offices by the group
-            $offices = Office::where('group_id','=',$request->query('group'))->get();
+            $offices = Office::where('group_id','=',$request->query('group'))->orderBy('is_main','desc')->orderBy('name','asc')->get();
 
             // Return
             return response()->json($offices);
@@ -29,10 +29,10 @@ class OfficeController extends Controller
         // Get offices
         if(Auth::user()->role_id == role('super-admin')) {
             $group = Group::find($request->query('group'));
-            $offices = $group ? Office::has('group')->where('group_id','=',$group->id)->orderBy('group_id','asc')->get() : Office::has('group')->orderBy('group_id','asc')->get();
+            $offices = $group ? Office::has('group')->where('group_id','=',$group->id)->orderBy('is_main','desc')->orderBy('name','asc')->get() : Office::has('group')->orderBy('group_id','asc')->orderBy('is_main','desc')->orderBy('name','asc')->get();
         }
         elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
-            $offices = Office::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('group_id','asc')->get();
+            $offices = Office::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('is_main','desc')->orderBy('name','asc')->get();
 
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
@@ -72,6 +72,7 @@ class OfficeController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
+            'is_main' => 'required'
         ]);
         
         // Check errors
@@ -84,6 +85,7 @@ class OfficeController extends Controller
             $office = new Office;
             $office->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $office->name = $request->name;
+            $office->is_main = $request->is_main;
             $office->save();
 
             // Redirect
@@ -141,6 +143,7 @@ class OfficeController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
+            'is_main' => 'required'
         ]);
         
         // Check errors
@@ -153,6 +156,7 @@ class OfficeController extends Controller
             $office = Office::find($request->id);
             $office->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $office->name = $request->name;
+            $office->is_main = $request->is_main;
             $office->save();
 
             // Redirect

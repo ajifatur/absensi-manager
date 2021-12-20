@@ -20,7 +20,7 @@ class PositionController extends Controller
     {
         if($request->ajax()) {
             // Get positions by the group
-            $positions = Position::where('group_id','=',$request->query('group'))->get();
+            $positions = Position::where('group_id','=',$request->query('group'))->orderBy('name','asc')->get();
 
             // Return
             return response()->json($positions);
@@ -29,10 +29,10 @@ class PositionController extends Controller
         // Get positions
         if(Auth::user()->role_id == role('super-admin')) {
             $group = Group::find($request->query('group'));
-            $positions = $group ? Position::has('group')->where('group_id','=',$group->id)->orderBy('group_id','asc')->get() : Position::has('group')->orderBy('group_id','asc')->get();
+            $positions = $group ? Position::has('group')->where('group_id','=',$group->id)->orderBy('name','asc')->get() : Position::has('group')->orderBy('group_id','asc')->orderBy('name','asc')->get();
         }
         elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
-            $positions = Position::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('group_id','asc')->get();
+            $positions = Position::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('name','asc')->get();
 
         // Get groups
         $groups = Group::orderBy('name','asc')->get();

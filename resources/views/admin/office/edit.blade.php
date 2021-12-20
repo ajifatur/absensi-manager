@@ -11,7 +11,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form method="post" action="{{ route('admin.office.store') }}" enctype="multipart/form-data">
+                <form method="post" action="{{ route('admin.office.update') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" value="{{ $office->id }}">
                     <div class="row mb-3">
@@ -39,6 +39,22 @@
                         </div>
                     </div>
                     @endif
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Kantor Pusat <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="is_main" id="is_main-1" value="1" {{ $office->is_main == '1' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_main-1">Ya</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="is_main" id="is_main-0" value="0" {{ $office->is_main == '0' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_main-0">Tidak</label>
+                            </div>
+                            @if($errors->has('is_main'))
+                            <div class="small text-danger">{{ $errors->first('is_main') }}</div>
+                            @endif
+                        </div>
+                    </div>
                     <hr>
                     <div class="row">
                         <div class="col-lg-2 col-md-3"></div>
