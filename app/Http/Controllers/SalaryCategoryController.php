@@ -28,14 +28,20 @@ class SalaryCategoryController extends Controller
         }
 
         // Get salary categories
-        if(Auth::user()->role_id == role('super-admin'))
-            $salary_categories = SalaryCategory::has('group')->orderBy('group_id','asc')->get();
+        if(Auth::user()->role_id == role('super-admin')) {
+            $group = Group::find($request->query('group'));
+            $salary_categories = $group ? SalaryCategory::has('group')->where('group_id','=',$group->id)->orderBy('group_id','asc')->get() : SalaryCategory::has('group')->orderBy('group_id','asc')->get();
+        }
         elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
             $salary_categories = SalaryCategory::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('group_id','asc')->get();
 
+        // Get groups
+        $groups = Group::orderBy('name','asc')->get();
+
         // View
         return view('admin/salary-category/index', [
-            'salary_categories' => $salary_categories
+            'salary_categories' => $salary_categories,
+            'groups' => $groups
         ]);
     }
 

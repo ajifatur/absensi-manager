@@ -11,6 +11,20 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
+            @if(Auth::user()->role_id == role('super-admin'))
+            <div class="card-header d-sm-flex justify-content-end align-items-center">
+                <div></div>
+                <div class="ms-sm-2 ms-0">
+                    <select name="group" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Perusahaan">
+                        <option value="0">Semua Perusahaan</option>
+                        @foreach($groups as $group)
+                        <option value="{{ $group->id }}" {{ Request::query('group') == $group->id ? 'selected' : '' }}>{{ $group->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <hr class="my-0">
+            @endif
             <div class="card-body">
                 @if(Session::get('message'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -19,13 +33,12 @@
                 </div>
                 @endif
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover table-bordered" id="datatable">
+                    <table class="table table-sm table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
                                 <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
-                                <th>Jam Kerja</th>
-                                <th width="150">Kantor</th>
                                 <th width="150">Jabatan</th>
+                                <th>Jam Kerja</th>
                                 <th width="60">Kuota</th>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <th width="150">Perusahaan</th>
@@ -38,18 +51,17 @@
                             <tr>
                                 <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
                                 <td>
-                                    {{ $work_hour->name }}<br>
-                                    <small class="text-muted">{{ date('H:i', strtotime($work_hour->start_at)) }} - {{ date('H:i', strtotime($work_hour->end_at)) }}</small>
-                                </td>
-                                <td>
-                                    @if($work_hour->office)
-                                        <a href="{{ route('admin.office.detail', ['id' => $work_hour->office->id]) }}">{{ $work_hour->office->name }}</a>
-                                    @endif
-                                </td>
-                                <td>
                                     @if($work_hour->position)
                                         <a href="{{ route('admin.position.detail', ['id' => $work_hour->position->id]) }}">{{ $work_hour->position->name }}</a>
                                     @endif
+                                    @if($work_hour->office)
+                                        <br>
+                                        <small class="text-muted">{{ $work_hour->office->name }}</small>
+                                    @endif
+                                </td>
+                                <td>
+                                    {{ $work_hour->name }}<br>
+                                    <small class="text-muted">{{ date('H:i', strtotime($work_hour->start_at)) }} - {{ date('H:i', strtotime($work_hour->end_at)) }}</small>
                                 </td>
                                 <td align="right">{{ number_format($work_hour->quota,0,',',',') }}</td>
                                 @if(Auth::user()->role_id == role('super-admin'))
@@ -86,13 +98,21 @@
 
 <script type="text/javascript">
     // DataTable
-    Spandiv.DataTable("#datatable");
+    Spandiv.DataTableRowsGroup("#datatable", [1]);
+
     // Button Delete
     Spandiv.ButtonDelete(".btn-delete", ".form-delete");
     
     // Checkbox
     Spandiv.CheckboxOne();
     Spandiv.CheckboxAll();
+
+    // Change the Group
+    $(document).on("change", ".card-header select[name=group]", function() {
+		var group = $(this).val();
+		if(group === "0") window.location.href = Spandiv.URL("{{ route('admin.work-hour.index') }}");
+		else window.location.href = Spandiv.URL("{{ route('admin.work-hour.index') }}", {group: group});
+    });
 </script>
 
 @endsection

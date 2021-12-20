@@ -27,14 +27,20 @@ class OfficeController extends Controller
         }
 
         // Get offices
-        if(Auth::user()->role_id == role('super-admin'))
-            $offices = Office::has('group')->orderBy('group_id','asc')->get();
+        if(Auth::user()->role_id == role('super-admin')) {
+            $group = Group::find($request->query('group'));
+            $offices = $group ? Office::has('group')->where('group_id','=',$group->id)->orderBy('group_id','asc')->get() : Office::has('group')->orderBy('group_id','asc')->get();
+        }
         elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
             $offices = Office::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('group_id','asc')->get();
 
+        // Get groups
+        $groups = Group::orderBy('name','asc')->get();
+
         // View
         return view('admin/office/index', [
-            'offices' => $offices
+            'offices' => $offices,
+            'groups' => $groups
         ]);
     }
 

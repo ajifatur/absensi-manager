@@ -30,14 +30,20 @@ class WorkHourController extends Controller
         }
 
         // Get work hours
-        if(Auth::user()->role_id == role('super-admin'))
-            $work_hours = WorkHour::has('group')->orderBy('group_id','asc')->get();
+        if(Auth::user()->role_id == role('super-admin')) {
+            $group = Group::find($request->query('group'));
+            $work_hours = $group ? WorkHour::has('group')->where('group_id','=',$group->id)->orderBy('group_id','asc')->get() : WorkHour::has('group')->orderBy('group_id','asc')->get();
+        }
         elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
             $work_hours = WorkHour::has('group')->where('group_id','=',Auth::user()->group_id)->orderBy('group_id','asc')->get();
 
+        // Get groups
+        $groups = Group::orderBy('name','asc')->get();
+
         // View
         return view('admin/work-hour/index', [
-            'work_hours' => $work_hours
+            'work_hours' => $work_hours,
+            'groups' => $groups
         ]);
     }
 
