@@ -21,7 +21,7 @@ class Group extends Model
      *
      * @param  array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'period_start', 'period_end'];
 
     /**
      * Get the users for the group.
