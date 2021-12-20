@@ -45,7 +45,7 @@
                         <span>{{ $user->name }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between p-1">
-                        <span class="font-weight-bold">Tanggal lahir:</span>
+                        <span class="font-weight-bold">Tanggal Lahir:</span>
                         <span>{{ date('d/m/Y', strtotime($user->birthdate)) }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between p-1">

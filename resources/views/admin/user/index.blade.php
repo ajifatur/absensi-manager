@@ -93,6 +93,9 @@
                                         <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Total (Rp.)</th>
                                     @endif
                                 @endif
+                                @if(Request::query('role') != 'member')
+                                <th rowspan="{{ Request::query('role') == 'member' && Request::query('office') != null && Request::query('position') != null && count($categories) > 0 ? 2 : 1 }}" width="100">Kunjungan Terakhir</th>
+                                @endif
                                 <th rowspan="{{ Request::query('role') == 'member' && Request::query('office') != null && Request::query('position') != null && count($categories) > 0 ? 2 : 1 }}" width="40">Opsi</th>
                             </tr>
                             @if(Request::query('role') == 'member' && Request::query('office') != null && Request::query('position') != null && count($categories) > 0)
@@ -148,6 +151,14 @@
                                             @endif
                                             <td align="right">{{ number_format(array_sum($user->salaries),0,',',',') }}</td>
                                         @endif
+                                    @endif
+                                    @if(Request::query('role') != 'member')
+                                    <td>
+                                        <span class="d-none">{{ $user->last_visit }}</span>
+                                        {{ date('d/m/Y', strtotime($user->last_visit)) }}
+                                        <br>
+                                        <small class="text-muted">{{ date('H:i', strtotime($user->last_visit)) }} WIB</small>
+                                    </td>
                                     @endif
                                     <td align="center">
                                         <div class="btn-group">
