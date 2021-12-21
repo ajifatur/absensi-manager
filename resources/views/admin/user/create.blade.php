@@ -42,7 +42,7 @@
                                 @if(Auth::user()->role_id == role('super-admin'))
                                     @if(old('office_id') != null || old('group_id') != null)
                                         <option value="" selected>--Pilih--</option>
-                                        @foreach(\App\Models\Group::find(old('group_id'))->offices as $office)
+                                        @foreach(\App\Models\Group::find(old('group_id'))->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                             <option value="{{ $office->id }}" {{ old('office_id') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                         @endforeach
                                     @else
@@ -50,7 +50,7 @@
                                     @endif
                                 @else
                                     <option value="" selected>--Pilih--</option>
-                                    @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices as $office)
+                                    @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                     <option value="{{ $office->id }}" {{ old('office_id') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                     @endforeach
                                 @endif
@@ -67,7 +67,7 @@
                                 @if(Auth::user()->role_id == role('super-admin'))
                                     @if(old('position_id') != null || old('group_id') != null)
                                         <option value="" selected>--Pilih--</option>
-                                        @foreach(\App\Models\Group::find(old('group_id'))->positions as $position)
+                                        @foreach(\App\Models\Group::find(old('group_id'))->positions()->orderBy('name','asc')->get() as $position)
                                             <option value="{{ $position->id }}" {{ old('position_id') == $position->id ? 'selected' : '' }}>{{ $position->name }}</option>
                                         @endforeach
                                     @else
@@ -75,7 +75,7 @@
                                     @endif
                                 @else
                                     <option value="" selected>--Pilih--</option>
-                                    @foreach(\App\Models\Group::find(Auth::user()->group_id)->positions as $position)
+                                    @foreach(\App\Models\Group::find(Auth::user()->group_id)->positions()->orderBy('name','asc')->get() as $position)
                                     <option value="{{ $position->id }}" {{ old('position_id') == $position->id ? 'selected' : '' }}>{{ $position->name }}</option>
                                     @endforeach
                                 @endif

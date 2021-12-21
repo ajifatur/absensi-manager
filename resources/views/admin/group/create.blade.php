@@ -22,6 +22,34 @@
                             @endif
                         </div>
                     </div>
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Tanggal Periode Awal <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <select name="period_start" class="form-select form-select-sm {{ $errors->has('period_start') ? 'border-danger' : '' }}">
+                                <option value="" disabled selected>--Pilih--</option>
+                                @for($i=1; $i<=28; $i++)
+                                <option value="{{ $i }}" {{ old('period_start') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                            @if($errors->has('period_start'))
+                            <div class="small text-danger">{{ $errors->first('period_start') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Tanggal Periode Akhir <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <select name="period_end" class="form-select form-select-sm {{ $errors->has('period_end') ? 'border-danger' : '' }}">
+                                <option value="" disabled selected>--Pilih--</option>
+                                @for($i=1; $i<=28; $i++)
+                                <option value="{{ $i }}" {{ old('period_end') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                            @if($errors->has('period_end'))
+                            <div class="small text-danger">{{ $errors->first('period_end') }}</div>
+                            @endif
+                        </div>
+                    </div>
                     <hr>
                     <div class="row">
                         <div class="col-lg-2 col-md-3"></div>

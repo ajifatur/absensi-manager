@@ -35,7 +35,7 @@
                         <div class="col-lg-10 col-md-9">
                             <select name="office_id" class="form-select form-select-sm {{ $errors->has('office_id') ? 'border-danger' : '' }}" id="office">
                                 <option value="" selected>--Pilih--</option>
-                                @foreach(\App\Models\Group::find($user->group_id)->offices as $office)
+                                @foreach(\App\Models\Group::find($user->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                     <option value="{{ $office->id }}" {{ $user->office_id == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                 @endforeach
                             </select>
@@ -49,7 +49,7 @@
                         <div class="col-lg-10 col-md-9">
                             <select name="position_id" class="form-select form-select-sm {{ $errors->has('position_id') ? 'border-danger' : '' }}" id="position">
                                 <option value="" selected>--Pilih--</option>
-                                @foreach(\App\Models\Group::find($user->group_id)->positions as $position)
+                                @foreach(\App\Models\Group::find($user->group_id)->positions()->orderBy('name','asc')->get() as $position)
                                     <option value="{{ $position->id }}" {{ $user->position_id == $position->id ? 'selected' : '' }}>{{ $position->name }}</option>
                                 @endforeach
                             </select>

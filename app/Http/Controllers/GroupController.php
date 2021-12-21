@@ -62,17 +62,21 @@ class GroupController extends Controller
         // Validation
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
+            'period_start' => 'required',
+            'period_end' => 'required'
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Save the group
             $group = new Group;
             $group->name = $request->name;
+            $group->period_start = $request->period_start;
+            $group->period_end = $request->period_end;
             $group->save();
 
             // Save the Head Office
@@ -134,17 +138,21 @@ class GroupController extends Controller
         // Validation
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
+            'period_start' => 'required',
+            'period_end' => 'required'
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Update the group
             $group = Group::find($request->id);
             $group->name = $request->name;
+            $group->period_start = $request->period_start;
+            $group->period_end = $request->period_end;
             $group->save();
 
             // Redirect

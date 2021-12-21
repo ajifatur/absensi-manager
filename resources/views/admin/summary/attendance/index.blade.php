@@ -79,6 +79,7 @@
                                     <tr>
                                         <td align="center"><input type="checkbox" class="form-check-input checkbox-one" data-id="{{ $user->id }}"></td>
                                         <td>
+                                            <span class="d-none">{{ $user->end_date != null ? 1 : 0 }}-{{ $user->name }}</span>
                                             <a href="{{ route('admin.user.detail', ['id' => $user->id]) }}">{{ $user->name }}</a>
                                             @if($user->position)
                                             <br>
