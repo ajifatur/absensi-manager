@@ -142,6 +142,17 @@
                             @endif
                         </div>
                     </div>
+                    @if(Request::query('role') == 'member')
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">NIK</label>
+                        <div class="col-lg-10 col-md-9">
+                            <input type="text" name="identity_number" class="form-control form-control-sm {{ $errors->has('identity_number') ? 'border-danger' : '' }}" value="{{ old('identity_number') }}">
+                            @if($errors->has('identity_number'))
+                            <div class="small text-danger">{{ $errors->first('identity_number') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Mulai Bekerja <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">

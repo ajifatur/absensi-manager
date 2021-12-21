@@ -58,6 +58,12 @@
                             @endif
                         </select>
                     </div>
+                    <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
+                        <select name="status" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Status">
+                            <option value="1" {{ $status == '1' ? 'selected' : '' }}>Aktif</option>
+                            <option value="0" {{ $status == '0' ? 'selected' : '' }}>Tidak Aktif</option>
+                        </select>
+                    </div>
                     <div class="ms-lg-2 ms-0">
                         <button type="submit" class="btn btn-sm btn-info" {{ Request::query('office') != null && Request::query('position') != null ? '' : 'disabled' }}><i class="bi-filter-square me-1"></i> Filter</button>
                     </div>
@@ -78,6 +84,9 @@
                         <thead class="bg-light">
                             <tr>
                                 <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
+                                @if(Request::query('role') == 'member')
+                                <th width="80">NIK</th>
+                                @endif
                                 <th>Identitas</th>
                                 @if(Request::query('role') == 'member')
                                     <th width="80">Tanggal Kontrak</th>
@@ -97,6 +106,9 @@
                             @foreach($users as $user)
                                 <tr>
                                     <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
+                                    @if(Request::query('role') == 'member')
+                                    <td>{{ $user->identity_number }}</td>
+                                    @endif
                                     <td>
                                         <a href="{{ route('admin.user.detail', ['id' => $user->id]) }}">{{ $user->name }}</a>
                                         <br>
@@ -110,7 +122,7 @@
                                             @if($user->end_date == null)
                                                 {{ date('d/m/Y', strtotime($user->start_date)) }}
                                             @else
-                                                <span class="badge badge-danger">Tidak Aktif</span>
+                                                <span class="badge bg-danger">Tidak Aktif</span>
                                             @endif
                                         </td>
                                         <td>

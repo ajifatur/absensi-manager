@@ -72,15 +72,21 @@
                         <span class="font-weight-bold">Username:</span>
                         <span>{{ $user->username }}</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between p-1">
-                        <span class="font-weight-bold">Mulai Bekerja:</span>
-                        <span>{{ date('d/m/Y', strtotime($user->start_date)) }}</span>
-                    </li>
-                    @if($user->end_date != null)
-                    <li class="list-group-item d-flex justify-content-between p-1">
-                        <span class="font-weight-bold">Akhir Bekerja:</span>
-                        <span>{{ date('d/m/Y', strtotime($user->end_date)) }}</span>
-                    </li>
+                    @if($user->role_id == role('member'))
+                        <li class="list-group-item d-flex justify-content-between p-1">
+                            <span class="font-weight-bold">NIK:</span>
+                            <span>{{ $user->identity_number }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between p-1">
+                            <span class="font-weight-bold">Mulai Bekerja:</span>
+                            <span>{{ date('d/m/Y', strtotime($user->start_date)) }}</span>
+                        </li>
+                        @if($user->end_date != null)
+                        <li class="list-group-item d-flex justify-content-between p-1">
+                            <span class="font-weight-bold">Akhir Bekerja:</span>
+                            <span>{{ date('d/m/Y', strtotime($user->end_date)) }}</span>
+                        </li>
+                        @endif
                     @endif
                 </ul>
             </div>

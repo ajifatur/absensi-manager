@@ -96,7 +96,11 @@
                                     <td><a href="{{ route('admin.user.detail', ['id' => $user->id]) }}">{{ $user->name }}</a></td>
                                     <td>
                                         <span class="d-none">{{ $user->end_date == null ? 1 : 0 }} {{ $user->start_date }}</span>
-                                        {{ date('d/m/Y', strtotime($user->start_date)) }}
+                                        @if($user->end_date == null)
+                                            {{ date('d/m/Y', strtotime($user->start_date)) }}
+                                        @else
+                                            <span class="badge bg-danger">Tidak Aktif</span>
+                                        @endif
                                     </td>
                                     @if(count($user->salary) > 0)
                                         @foreach($user->salary as $salary)

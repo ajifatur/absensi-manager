@@ -30,18 +30,18 @@ class SummaryAttendanceController extends Controller
         $t1 = $request->query('t1') != null ? DateTimeExt::change($request->query('t1')) : $dt1;
         $t2 = $request->query('t2') != null ? DateTimeExt::change($request->query('t2')) : $dt2;
 
-        if(Auth::user()->role_id == role('super-admin')){
+        if(Auth::user()->role_id == role('super-admin')) {
             // Set params
             $group = $request->query('group') != null ? $request->query('group') : 0;
             $office = $request->query('office') != null ? $request->query('office') : 0;
 
             // Get users
             if($group != 0 && $office != 0)
-                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->where('office_id','=',$office)->get();
+                $users = User::where('role_id','=',role('member'))->where('group_id','=',$group)->where('office_id','=',$office)->get();
             elseif($group != 0 && $office == 0)
-                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->get();
+                $users = User::where('role_id','=',role('member'))->where('group_id','=',$group)->get();
             else
-                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->get();
+                $users = User::where('role_id','=',role('member'))->get();
         }
         elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
             // Set params
@@ -50,9 +50,9 @@ class SummaryAttendanceController extends Controller
 
             // Get users
             if($office != 0)
-                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->where('office_id','=',$office)->get();
+                $users = User::where('role_id','=',role('member'))->where('group_id','=',$group)->where('office_id','=',$office)->get();
             else
-                $users = User::where('role_id','=',role('member'))->where('end_date','=',null)->where('group_id','=',$group)->get();
+                $users = User::where('role_id','=',role('member'))->where('group_id','=',$group)->get();
         }
 
         // Set users attendances and absents
@@ -92,7 +92,7 @@ class SummaryAttendanceController extends Controller
         $groups = Group::orderBy('name','asc')->get();
 
         // View
-        return view('admin/attendance/summary', [
+        return view('admin/summary/attendance/index', [
             'groups' => $groups,
             'users' => $users,
             't1' => $t1,
@@ -119,73 +119,56 @@ class SummaryAttendanceController extends Controller
         $t1 = $request->query('t1') != null ? DateTimeExt::change($request->query('t1')) : $dt1;
         $t2 = $request->query('t2') != null ? DateTimeExt::change($request->query('t2')) : $dt2;
 
-        if(Auth::user()->role_id != role('member')) {
-            // Get the user
-            $user = User::findOrFail($id);
+        // Get the user
+        $user = User::findOrFail($id);
 
-            // Get the work hours
-            $workhours = WorkHour::where('group_id','=',$user->group_id)->where('office_id','=',$user->office_id)->where('position_id','=',$user->position_id)->orderBy('name','asc')->get();
+        // Get the work hours
+        $workhours = WorkHour::where('group_id','=',$user->group_id)->where('office_id','=',$user->office_id)->where('position_id','=',$user->position_id)->orderBy('name','asc')->get();
 
-            // Get attendances
-            if($workhour == 0)
-                $attendances = Attendance::where('user_id','=',$user->id)->whereDate('date','>=',$t1)->whereDate('date','<=',$t2)->orderBy('date','desc')->get();
-            else
-                $attendances = Attendance::where('user_id','=',$user->id)->where('workhour_id','=',$workhour)->whereDate('date','>=',$t1)->whereDate('date','<=',$t2)->orderBy('date','desc')->get();
-
-            // Count attendances
-            $count[1] = $attendances->count();
-
-            // Get late attendances
-            $late = 0;
-            foreach($attendances as $key=>$attendance) {
-                $date = $attendance->start_at <= $attendance->end_at ? $attendance->date : date('Y-m-d', strtotime('-1 day', strtotime($attendance->date)));
-                if(strtotime($attendance->entry_at) >= strtotime($date.' '.$attendance->start_at) + 60) $late++;
-                if($category == 2) if(strtotime($attendance->entry_at) < strtotime($date.' '.$attendance->start_at) + 60) $attendances->forget($key);
-            }
-
-            // Count late attendances
-            $count[2] = $late;
-
-            // Get absents
-            $absents1 = Absent::where('user_id','=',$user->id)->where('category_id','=',1)->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
-            $absents2 = Absent::where('user_id','=',$user->id)->where('category_id','=',2)->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
-            if($category == 3) $attendances = $absents1;
-            if($category == 4) $attendances = $absents2;
-
-            // Get leaves
-            $leaves = Leave::where('user_id','=',$user->id)->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
-            if($category == 5) $attendances = $leaves;
-
-            // Count absents
-            $count[3] = count($absents1);
-            $count[4] = count($absents2);
-            $count[5] = count($leaves);
-
-            // View
-            return view('admin/attendance/detail', [
-                'user' => $user,
-                'workhours' => $workhours,
-                'attendances' => $attendances,
-                'category' => $category,
-                't1' => $t1,
-                't2' => $t2,
-                'count' => $count
-            ]);
-        }
-        else {
-            // Get the user
-            $user = User::findOrFail(Auth::user()->id);
-
-            // Get attendances
+        // Get attendances
+        if($workhour == 0)
             $attendances = Attendance::where('user_id','=',$user->id)->whereDate('date','>=',$t1)->whereDate('date','<=',$t2)->orderBy('date','desc')->get();
+        else
+            $attendances = Attendance::where('user_id','=',$user->id)->where('workhour_id','=',$workhour)->whereDate('date','>=',$t1)->whereDate('date','<=',$t2)->orderBy('date','desc')->get();
 
-            // View
-            return view('member/attendance/detail', [
-                'user' => $user,
-                'attendances' => $attendances,
-                't1' => $t1,
-                't2' => $t2,
-            ]);
+        // Count attendances
+        $count[1] = $attendances->count();
+
+        // Get late attendances
+        $late = 0;
+        foreach($attendances as $key=>$attendance) {
+            $date = $attendance->start_at <= $attendance->end_at ? $attendance->date : date('Y-m-d', strtotime('-1 day', strtotime($attendance->date)));
+            if(strtotime($attendance->entry_at) >= strtotime($date.' '.$attendance->start_at) + 60) $late++;
+            if($category == 2) if(strtotime($attendance->entry_at) < strtotime($date.' '.$attendance->start_at) + 60) $attendances->forget($key);
         }
+
+        // Count late attendances
+        $count[2] = $late;
+
+        // Get absents
+        $absents1 = Absent::where('user_id','=',$user->id)->where('category_id','=',1)->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
+        $absents2 = Absent::where('user_id','=',$user->id)->where('category_id','=',2)->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
+        if($category == 3) $attendances = $absents1;
+        if($category == 4) $attendances = $absents2;
+
+        // Get leaves
+        $leaves = Leave::where('user_id','=',$user->id)->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
+        if($category == 5) $attendances = $leaves;
+
+        // Count absents
+        $count[3] = count($absents1);
+        $count[4] = count($absents2);
+        $count[5] = count($leaves);
+
+        // View
+        return view('admin/summary/attendance/detail', [
+            'user' => $user,
+            'workhours' => $workhours,
+            'attendances' => $attendances,
+            'category' => $category,
+            't1' => $t1,
+            't2' => $t2,
+            'count' => $count
+        ]);
     }
 }

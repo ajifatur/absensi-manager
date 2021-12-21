@@ -31,16 +31,20 @@ class UserController extends Controller
         if($request->ajax()) {
             if($request->query('office') == null) {
                 // Get users by the group
-                $users = User::where('group_id','=',$request->query('group'))->where('role_id','=',role('member'))->where('end_date','=',null)->orderBy('name','asc')->get();
+                $users = User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('end_date','=',null)->orderBy('name','asc')->get();
             }
             else {
                 // Get users by the group and office
-                $users = User::where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('role_id','=',role('member'))->where('end_date','=',null)->orderBy('name','asc')->get();
+                $users = User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('end_date','=',null)->orderBy('name','asc')->get();
             }
 
             // Return
             return response()->json($users);
         }
+
+        // Set the status and status sign
+        $status = $request->query('status') != null ? $request->query('status') : 1;
+        $statusSign = $status == 1 ? '=' : '!=';
 
         // Get users
         if(Auth::user()->role_id == role('super-admin')) {
@@ -49,7 +53,7 @@ class UserController extends Controller
             elseif($request->query('role') == 'manager')
                 $users = User::where('role_id','=',role('manager'))->orderBy('last_visit','desc')->get();
             elseif($request->query('role') == 'member')
-                $users = $request->query('group') != null && $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date','=',null)->orderBy('name','asc')->get() : User::where('role_id','=',role('member'))->where('end_date','=',null)->orderBy('name','asc')->get();
+                $users = $request->query('group') != null && $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get() : User::where('role_id','=',role('member'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
             else
                 return redirect()->route('admin.user.index', ['role' => 'member']);
         }
@@ -59,7 +63,7 @@ class UserController extends Controller
             elseif($request->query('role') == 'manager')
                 $users = User::where('role_id','=',role('manager'))->where('group_id','=',Auth::user()->group_id)->orderBy('last_visit','desc')->get();
             elseif($request->query('role') == 'member')
-                $users = $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date','=',null)->orderBy('name','asc')->get() : User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date','=',null)->orderBy('name','asc')->get();
+                $users = $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get() : User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
             else
                 return redirect()->route('admin.user.index', ['role' => 'member']);
         }
@@ -67,7 +71,7 @@ class UserController extends Controller
             if($request->query('role') == 'admin' || $request->query('role') == 'manager')
                 abort(403);
             elseif($request->query('role') == 'member')
-                $users = $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date','=',null)->get() : User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date','=',null)->get();
+                $users = $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->get() : User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date',$statusSign,null)->get();
             else
                 return redirect()->route('admin.user.index', ['role' => 'member']);
         }
@@ -78,7 +82,8 @@ class UserController extends Controller
         // View
         return view('admin/user/index', [
             'users' => $users,
-            'groups' => $groups
+            'groups' => $groups,
+            'status' => $status
         ]);
     }
 
@@ -128,11 +133,11 @@ class UserController extends Controller
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Save the user
             $user = new User;
             $user->role_id = Auth::user()->role_id == role('manager') ? role('member') : $request->role_id;
@@ -146,6 +151,7 @@ class UserController extends Controller
             $user->start_date = DateTimeExt::change($request->start_date);
             $user->end_date = $request->end_date != '' ? DateTimeExt::change($request->end_date) : null;
             $user->phone_number = $request->phone_number;
+            $user->identity_number = !in_array($request->role_id, [role('admin'), role('manager')]) ? $request->identity_number : '';
             $user->latest_education = $request->latest_education;
             $user->email = $request->email;
             $user->username = $request->username;
@@ -236,7 +242,7 @@ class UserController extends Controller
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Update the user
             $user = User::find($request->id);
             $user->office_id = $request->office_id;
@@ -249,6 +255,7 @@ class UserController extends Controller
             $user->end_date = $request->end_date != '' ? DateTimeExt::change($request->end_date) : null;
             $user->phone_number = $request->phone_number;
             $user->latest_education = $request->latest_education;
+            $user->identity_number = !in_array($request->role_id, [role('admin'), role('manager')]) ? $request->identity_number : '';
             $user->email = $request->email;
             $user->username = $request->username;
             $user->password = $request->password != '' ? bcrypt($request->password) : $user->password;

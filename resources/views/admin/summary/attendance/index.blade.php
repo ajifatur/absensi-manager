@@ -84,6 +84,10 @@
                                             <br>
                                             <small class="text-muted">{{ $user->position->name }}</small>
                                             @endif
+                                            @if($user->end_date != null)
+                                            <br>
+                                            <span class="badge bg-danger">Tidak Aktif</span>
+                                            @endif
                                         </td>
                                         <td class="{{ Request::query('office') != '' && Request::query('office') != 0 ? 'd-none' : '' }}">
                                             @if($user->office)
