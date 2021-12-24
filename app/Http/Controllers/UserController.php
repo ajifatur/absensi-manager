@@ -337,14 +337,16 @@ class UserController extends Controller
             if($category->type_id == 1) {
                 $check = $user->indicators()->where('category_id','=',$category->id)->first();
                 $value = $check ? $check->value : 0;
-                $total += Salary::getAmountByRange($value, $user->group_id, $category->id);
+                $amount_c = Salary::getAmountByRange($value, $user->group_id, $category->id);
+                if($category->multiplied_by_attendances == 1) $amount_c = $amount_c * $attendances;
+                $total += $amount_c;
             }
             // By period per month
-            elseif($category->type_id == 2)
-                $total += Salary::getAmountByRange($period, $user->group_id, $category->id);
-            // By attendance per month
-            elseif($category->type_id == 3)
-                $total += Salary::getAmountByRange($attendances, $user->group_id, $category->id) * $attendances;
+            elseif($category->type_id == 2) {
+                $amount_c = Salary::getAmountByRange($period, $user->group_id, $category->id);
+                if($category->multiplied_by_attendances == 1) $amount_c = $amount_c * $attendances;
+                $total += $amount_c;
+            }
         }
         
         // Response

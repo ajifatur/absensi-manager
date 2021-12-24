@@ -57,10 +57,25 @@
                                 <option value="" selected>--Pilih--</option>
                                 <option value="1" {{ $salary_category->type_id == 1 ? 'selected' : '' }}>Manual</option>
                                 <option value="2" {{ $salary_category->type_id == 2 ? 'selected' : '' }}>Masa Kerja (Bulan)</option>
-                                <option value="3" {{ $salary_category->type_id == 3 ? 'selected' : '' }}>Kehadiran per Bulan</option>
                             </select>
                             @if($errors->has('type_id'))
                             <div class="small text-danger">{{ $errors->first('type_id') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Dikalikan dengan Kehadiran <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="multiplied_by_attendances" id="multiplied_by_attendances-1" value="1" {{ $salary_category->multiplied_by_attendances == '1' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="multiplied_by_attendances-1">Ya</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="multiplied_by_attendances" id="multiplied_by_attendances-0" value="0" {{ $salary_category->multiplied_by_attendances == '0' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="multiplied_by_attendances-0">Tidak</label>
+                            </div>
+                            @if($errors->has('multiplied_by_attendances'))
+                            <div class="small text-danger">{{ $errors->first('multiplied_by_attendances') }}</div>
                             @endif
                         </div>
                     </div>

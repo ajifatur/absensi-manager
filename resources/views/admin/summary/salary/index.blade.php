@@ -75,6 +75,7 @@
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}">Karyawan</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Tanggal Kontrak</th>
+                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Kehadiran</th>
                                 @if(count($categories) > 0)
                                 <th colspan="{{ count($categories) }}">Rincian Gaji Kotor</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Total Gaji Kotor</th>
@@ -102,6 +103,7 @@
                                             <span class="badge bg-danger">Tidak Aktif</span>
                                         @endif
                                     </td>
+                                    <td align="right">{{ number_format($user->attendances,0,',',',') }}</td>
                                     @if(count($user->salary) > 0)
                                         @foreach($user->salary as $salary)
                                         <td align="right">
@@ -113,9 +115,6 @@
                                             @elseif($salary['category']->type_id == 2)
                                                 <p class="text-start text-muted mb-0">Masa Kerja:</p>
                                                 <p class="text-start text-success mb-0">{{ number_format($salary['value'],1,'.',',') }} bulan</p>
-                                            @elseif($salary['category']->type_id == 3)
-                                                <p class="text-start text-muted mb-0">Kehadiran:</p>
-                                                <p class="text-start text-success mb-0">{{ number_format($salary['value'],0,'.',',') }} kali</p>
                                             @endif
                                         </td>
                                         @endforeach

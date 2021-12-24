@@ -41,6 +41,7 @@
                                 <th>Kategori</th>
                                 <th width="150">Tipe</th>
                                 <th width="80">Indikator</th>
+                                <th width="80">Dikalikan dengan Kehadiran</th>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <th width="150">Perusahaan</th>
                                 @endif
@@ -60,10 +61,10 @@
                                 <td>
                                     @if($category->type_id == 1) Manual
                                     @elseif($category->type_id == 2) Masa Kerja (Bulan)
-                                    @elseif($category->type_id == 3) Kehadiran per Bulan
                                     @endif
                                 </td>
                                 <td>{{ number_format($category->indicators()->count(),0,',',',') }}</td>
+                                <td><span class="badge {{ $category->multiplied_by_attendances == 1 ? 'bg-success' : 'bg-danger' }}">{{ $category->multiplied_by_attendances == 1 ? 'Ya' : 'Tidak' }}</span></td>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <td>
                                     @if($category->group)

@@ -75,6 +75,7 @@ class SalaryCategoryController extends Controller
             'position_id' => 'required',
             'name' => 'required|max:255',
             'type_id' => 'required',
+            'multiplied_by_attendances' => 'required',
         ]);
         
         // Check errors
@@ -89,6 +90,7 @@ class SalaryCategoryController extends Controller
             $salary_category->position_id = $request->position_id;
             $salary_category->name = $request->name;
             $salary_category->type_id = $request->type_id;
+            $salary_category->multiplied_by_attendances = $request->multiplied_by_attendances;
             $salary_category->save();
 
             // Redirect
@@ -130,6 +132,7 @@ class SalaryCategoryController extends Controller
             'position_id' => 'required',
             'name' => 'required|max:255',
             'type_id' => 'required',
+            'multiplied_by_attendances' => 'required',
         ]);
         
         // Check errors
@@ -143,6 +146,7 @@ class SalaryCategoryController extends Controller
             $salary_category->position_id = $request->position_id;
             $salary_category->name = $request->name;
             $salary_category->type_id = $request->type_id;
+            $salary_category->multiplied_by_attendances = $request->multiplied_by_attendances;
             $salary_category->save();
 
             // Redirect

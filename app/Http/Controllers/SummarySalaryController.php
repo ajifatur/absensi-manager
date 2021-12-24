@@ -70,31 +70,35 @@ class SummarySalaryController extends Controller
                     if($category->type_id == 1) {
                         $check = $user->indicators()->where('category_id','=',$category->id)->first();
                         $value = $check ? $check->value : 0;
+                        $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
+                        if($category->multiplied_by_attendances == 1) $amount = $amount * $users[$key]->attendances;
                         array_push($salary, [
                             'category' => $category,
                             'value' => $value,
-                            'amount' => Salary::getAmountByRange($value, $user->group_id, $category->id)
+                            'amount' => $amount
                         ]);
-                        $totalSalary += Salary::getAmountByRange($value, $user->group_id, $category->id);
+                        $totalSalary += $amount;
                     }
                     // By period per month
                     elseif($category->type_id == 2) {
+                        $amount = Salary::getAmountByRange($users[$key]->period, $user->group_id, $category->id);
+                        if($category->multiplied_by_attendances == 1) $amount = $amount * $users[$key]->attendances;
                         array_push($salary, [
                             'category' => $category,
                             'value' => $users[$key]->period,
-                            'amount' => Salary::getAmountByRange($users[$key]->period, $user->group_id, $category->id)
+                            'amount' => $amount
                         ]);
-                        $totalSalary += Salary::getAmountByRange($users[$key]->period, $user->group_id, $category->id);
+                        $totalSalary += $amount;
                     }
-                    // By attendance per month
-                    elseif($category->type_id == 3) {
-                        array_push($salary, [
-                            'category' => $category,
-                            'value' => $users[$key]->attendances,
-                            'amount' => Salary::getAmountByRange($users[$key]->attendances, $user->group_id, $category->id) * $users[$key]->attendances
-                        ]);
-                        $totalSalary += Salary::getAmountByRange($users[$key]->attendances, $user->group_id, $category->id) * $users[$key]->attendances;
-                    }
+                    // // By attendance per month
+                    // elseif($category->type_id == 3) {
+                    //     array_push($salary, [
+                    //         'category' => $category,
+                    //         'value' => $users[$key]->attendances,
+                    //         'amount' => Salary::getAmountByRange($users[$key]->attendances, $user->group_id, $category->id) * $users[$key]->attendances
+                    //     ]);
+                    //     $totalSalary += Salary::getAmountByRange($users[$key]->attendances, $user->group_id, $category->id) * $users[$key]->attendances;
+                    // }
                 }
                 $users[$key]->salary = $salary;
                 $users[$key]->totalSalary = $totalSalary;
