@@ -52,8 +52,21 @@ class UserController extends Controller
                 $users = User::where('role_id','=',role('admin'))->orderBy('last_visit','desc')->get();
             elseif($request->query('role') == 'manager')
                 $users = User::where('role_id','=',role('manager'))->orderBy('last_visit','desc')->get();
-            elseif($request->query('role') == 'member')
-                $users = $request->query('group') != null && $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get() : User::where('role_id','=',role('member'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+            elseif($request->query('role') == 'member') {
+                if($request->query('group') != null && $request->query('group') != 0) {
+                    if($request->query('office') != null && $request->query('office') != 0 && $request->query('position') != null && $request->query('position') != 0)
+                        $users = User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                    elseif(($request->query('office') == null || $request->query('office') == 0) && $request->query('position') != null && $request->query('position') != 0)
+                        $users = User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                    elseif($request->query('office') != null && $request->query('office') != 0 && ($request->query('position') == null || $request->query('position') == 0))
+                        $users = User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                    else
+                        $users = User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+
+                }
+                else
+                    $users = User::where('role_id','=',role('member'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+            }
             else
                 return redirect()->route('admin.user.index', ['role' => 'member']);
         }
@@ -62,16 +75,32 @@ class UserController extends Controller
                 $users = User::where('role_id','=',role('admin'))->where('group_id','=',Auth::user()->group_id)->orderBy('last_visit','desc')->get();
             elseif($request->query('role') == 'manager')
                 $users = User::where('role_id','=',role('manager'))->where('group_id','=',Auth::user()->group_id)->orderBy('last_visit','desc')->get();
-            elseif($request->query('role') == 'member')
-                $users = $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get() : User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+            elseif($request->query('role') == 'member') {
+                if($request->query('office') != null && $request->query('office') != 0 && $request->query('position') != null && $request->query('position') != 0)
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                elseif(($request->query('office') == null || $request->query('office') == 0) && $request->query('position') != null && $request->query('position') != 0)
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                elseif($request->query('office') != null && $request->query('office') != 0 && ($request->query('position') == null || $request->query('position') == 0))
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                else
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+            }
             else
                 return redirect()->route('admin.user.index', ['role' => 'member']);
         }
         elseif(Auth::user()->role_id == role('manager')) {
             if($request->query('role') == 'admin' || $request->query('role') == 'manager')
                 abort(403);
-            elseif($request->query('role') == 'member')
-                $users = $request->query('office') != null && $request->query('position') != null ? User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->get() : User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date',$statusSign,null)->get();
+            elseif($request->query('role') == 'member') {
+                if($request->query('office') != null && $request->query('office') != 0 && $request->query('position') != null && $request->query('position') != 0)
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                elseif(($request->query('office') == null || $request->query('office') == 0) && $request->query('position') != null && $request->query('position') != 0)
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                elseif($request->query('office') != null && $request->query('office') != 0 && ($request->query('position') == null || $request->query('position') == 0))
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                else
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+            }
             else
                 return redirect()->route('admin.user.index', ['role' => 'member']);
         }

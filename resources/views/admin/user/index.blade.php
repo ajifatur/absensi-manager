@@ -28,7 +28,7 @@
                     @endif
                     <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
                         <select name="office" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Kantor">
-                            <option value="0" disabled selected>--Pilih Kantor--</option>
+                            <option value="0" selected>Semua Kantor</option>
                             @if(Auth::user()->role_id == role('super-admin'))
                                 @if(Request::query('group') != 0)
                                     @foreach(\App\Models\Group::find(Request::query('group'))->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
@@ -44,7 +44,7 @@
                     </div>
                     <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
                         <select name="position" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Jabatan">
-                            <option value="0" disabled selected>--Pilih Jabatan--</option>
+                            <option value="0" selected>Semua Jabatan</option>
                             @if(Auth::user()->role_id == role('super-admin'))
                                 @if(Request::query('group') != 0)
                                     @foreach(\App\Models\Group::find(Request::query('group'))->positions()->orderBy('name','asc')->get() as $position)
@@ -65,7 +65,7 @@
                         </select>
                     </div>
                     <div class="ms-lg-2 ms-0">
-                        <button type="submit" class="btn btn-sm btn-info" {{ Request::query('office') != null && Request::query('position') != null ? '' : 'disabled' }}><i class="bi-filter-square me-1"></i> Filter</button>
+                        <button type="submit" class="btn btn-sm btn-info"><i class="bi-filter-square me-1"></i> Filter</button>
                     </div>
                 </form>
             </div>
@@ -183,9 +183,6 @@
 <script type="text/javascript">
     // DataTable
     Spandiv.DataTable("#datatable");
-
-    // Datepicker
-    Spandiv.DatePicker("input[name=t1], input[name=t2]");
     
     // Button Delete
     Spandiv.ButtonDelete(".btn-delete", ".form-delete");
@@ -202,7 +199,7 @@
             url: "{{ route('api.office.index') }}",
             data: {group: group},
             success: function(result){
-                var html = '<option value="0" disabled selected>--Pilih Kantor--</option>';
+                var html = '<option value="0" selected>Semua Kantor</option>';
                 $(result).each(function(key,value){
                     html += '<option value="' + value.id + '">' + value.name + '</option>';
                 });
@@ -214,24 +211,13 @@
             url: "{{ route('api.position.index') }}",
             data: {group: group},
             success: function(result){
-                var html = '<option value="0" disabled selected>--Pilih Jabatan--</option>';
+                var html = '<option value="0" selected>Semua Jabatan</option>';
                 $(result).each(function(key,value){
                     html += '<option value="' + value.id + '">' + value.name + '</option>';
                 });
                 $("select[name=position]").html(html);
             }
         });
-        $("#form-filter").find("button[type=submit]").attr("disabled","disabled");
-    });
-
-    // Change the Office and Position
-    $(document).on("change", "select[name=office], select[name=position]", function() {
-        var office = $("select[name=office]").val();
-        var position = $("select[name=position]").val();
-        if(office !== null && position !== null)
-            $("#form-filter").find("button[type=submit]").removeAttr("disabled");
-        else
-            $("#form-filter").find("button[type=submit]").attr("disabled","disabled");
     });
 </script>
 
