@@ -326,8 +326,12 @@ class UserController extends Controller
         $period = abs(Date::diff($user->start_date, date('Y-m').'-'.$user->group->period_start)['days']) / 30;
         $attendances = Attendance::where('user_id','=',$user->id)->where('date','>=',$dt1)->where('date','<=',$dt2)->count();
 
+        // Get category
+        $category = SalaryCategory::where('group_id','=',$user->group_id)->find($request->category);
+
         // Set amount
         $amount = Salary::getAmountByRange($request->value, $user->group_id, $request->category);
+        if($category->multiplied_by_attendances == 1) $amount = $amount * $attendances;
                 
         // Set total salary
         $categories = SalaryCategory::where('group_id','=',$user->group_id)->where('position_id','=',$user->position_id)->get();
