@@ -70,4 +70,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\UserIndicator::class);
     }
+
+    /**
+     * Get the late funds for the user.
+     */
+    public function late_funds()
+    {
+        return $this->hasMany(\App\Models\UserLateFund::class);
+    }
+
+    /**
+     * Get the debt funds for the user.
+     */
+    public function debt_funds()
+    {
+        return $this->hasMany(\App\Models\UserDebtFund::class);
+    }
 }

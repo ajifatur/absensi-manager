@@ -66,6 +66,20 @@
                         </div>
                     </div>
                     <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Kategori <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <select name="category_id" class="form-select form-select-sm {{ $errors->has('category_id') ? 'border-danger' : '' }}">
+                                <option value="0">Tak Berkategori</option>
+                                @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ $work_hour->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('category_id'))
+                            <div class="small text-danger">{{ $errors->first('category_id') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Kuota <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
                             <input type="text" name="quota" class="form-control form-control-sm {{ $errors->has('quota') ? 'border-danger' : '' }}" value="{{ $work_hour->quota }}">

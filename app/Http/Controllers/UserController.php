@@ -17,6 +17,7 @@ use App\Models\Office;
 use App\Models\SalaryCategory;
 use App\Models\UserIndicator;
 use App\Models\Attendance;
+use App\Models\WorkHourCategory;
 
 class UserController extends Controller
 {
@@ -297,67 +298,6 @@ class UserController extends Controller
             // Redirect
             return redirect()->route('admin.user.index', ['role' => $role->code])->with(['message' => 'Berhasil mengupdate data.']);
         }
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function updateValue(Request $request)
-    {
-        // Get the user
-        $user = User::find($request->user);
-
-        // Update / create the user indicator
-        $user_indicator = UserIndicator::where('user_id','=',$user->id)->where('category_id','=',$request->category)->first();
-        if(!$user_indicator) $user_indicator = new UserIndicator;
-        $user_indicator->user_id = $user->id;
-        $user_indicator->category_id = $request->category;
-        $user_indicator->value = $request->value;
-        $user_indicator->save();
-
-        // Set default date
-        $dt1 = date('m') > 1 ? date('Y-m-d', strtotime(date('Y').'-'.(date('m')-1).'-'.$user->group->period_start)) : date('Y-m-d', strtotime((date('Y')-1).'-12-'.$user->group->period_start));
-        $dt2 = date('Y-m-d', strtotime(date('Y').'-'.date('m').'-'.$user->group->period_end));
-
-        // Set the period and attendance by month
-        $period = abs(Date::diff($user->start_date, date('Y-m').'-'.$user->group->period_start)['days']) / 30;
-        $attendances = Attendance::where('user_id','=',$user->id)->where('date','>=',$dt1)->where('date','<=',$dt2)->count();
-
-        // Get category
-        $category = SalaryCategory::where('group_id','=',$user->group_id)->find($request->category);
-
-        // Set amount
-        $amount = Salary::getAmountByRange($request->value, $user->group_id, $request->category);
-        if($category->multiplied_by_attendances == 1) $amount = $amount * $attendances;
-                
-        // Set total salary
-        $categories = SalaryCategory::where('group_id','=',$user->group_id)->where('position_id','=',$user->position_id)->get();
-        $total = 0;
-        foreach($categories as $category) {
-            // By manual
-            if($category->type_id == 1) {
-                $check = $user->indicators()->where('category_id','=',$category->id)->first();
-                $value = $check ? $check->value : 0;
-                $amount_c = Salary::getAmountByRange($value, $user->group_id, $category->id);
-                if($category->multiplied_by_attendances == 1) $amount_c = $amount_c * $attendances;
-                $total += $amount_c;
-            }
-            // By period per month
-            elseif($category->type_id == 2) {
-                $amount_c = Salary::getAmountByRange($period, $user->group_id, $category->id);
-                if($category->multiplied_by_attendances == 1) $amount_c = $amount_c * $attendances;
-                $total += $amount_c;
-            }
-        }
-        
-        // Response
-        return response()->json([
-            'amount' => number_format($amount,0,',',','),
-            'total' => number_format($total,0,',',',')
-        ]);
     }
 
     /**

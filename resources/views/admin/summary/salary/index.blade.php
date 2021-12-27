@@ -12,10 +12,24 @@
         <div class="card">
             <div class="card-header d-sm-flex justify-content-center align-items-center">
                 <form id="form-filter" class="d-lg-flex" method="get" action="">
-                    @if(Auth::user()->role_id == role('super-admin'))
                     <div class="mb-lg-0 mb-2">
+                        <select name="month" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Periode Bulan">
+                            @for($i=1; $i<=12; $i++)
+                            <option value="{{ $i }}" {{ $month == $i ? 'selected' : '' }}>{{ \Ajifatur\Helpers\DateTimeExt::month($i) }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
+                        <select name="year" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Periode Tahun">
+                            @for($i=2022; $i>=2020; $i--)
+                            <option value="{{ $i }}" {{ $year == $i ? 'selected' : '' }}>{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    @if(Auth::user()->role_id == role('super-admin'))
+                    <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
                         <select name="group" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Perusahaan">
-                            <option value="0">Semua Perusahaan</option>
+                            <option value="0">--Pilih Perusahaan--</option>
                             @foreach($groups as $group)
                             <option value="{{ $group->id }}" {{ Request::query('group') == $group->id ? 'selected' : '' }}>{{ $group->name }}</option>
                             @endforeach
@@ -80,6 +94,8 @@
                                 <th colspan="{{ count($categories) }}">Rincian Gaji Kotor</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Total Gaji Kotor</th>
                                 @endif
+                                <th colspan="2">Rincian Potongan</th>
+                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Total Gaji Bersih</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="40">Opsi</th>
                             </tr>
                             @if(Request::query('office') != null && Request::query('position') != null && count($categories) > 0)
@@ -87,6 +103,8 @@
                                     @foreach($categories as $category)
                                     <th width="80">{{ $category->name }}</th>
                                     @endforeach
+                                    <th width="100">Keterlambatan</th>
+                                    <th width="100">Kasbon</th>
                                 </tr>
                             @endif
                         </thead>
@@ -103,7 +121,18 @@
                                             <span class="badge bg-danger">Tidak Aktif</span>
                                         @endif
                                     </td>
-                                    <td align="right">{{ number_format($user->attendances,0,',',',') }}</td>
+                                    <td align="{{ is_int($user->attendances) ? 'right' : 'left' }}">
+                                        @if(is_int($user->attendances))
+                                            {{ number_format($user->attendances,0,',',',') }}
+                                        @elseif(is_array($user->attendances))
+                                            @foreach($user->attendances as $key=>$attendance)
+                                                <p class="mb-0">{{ $attendance['name'] }}:<br><span class="text-success">{{ $attendance['count'] }}x</span></p>
+                                                @if($key != count($user->attendances))
+                                                <hr class="my-1">
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    </td>
                                     @if(count($user->salary) > 0)
                                         @foreach($user->salary as $salary)
                                         <td align="right">
@@ -111,7 +140,7 @@
                                             <hr class="my-1">
                                             @if($salary['category']->type_id == 1)
                                                 <p class="text-start text-muted mb-0">Nilai:</p>
-                                                <input type="number" class="form-control form-control-sm user-indicator" data-user="{{ $user->id }}" data-category="{{ $salary['category']->id }}" value="{{ $salary['value'] }}">
+                                                <input type="number" class="form-control form-control-sm user-indicator" data-user="{{ $user->id }}" data-category="{{ $salary['category']->id }}" data-month="{{ $month }}" data-year="{{ $year }}" value="{{ $salary['value'] }}">
                                             @elseif($salary['category']->type_id == 2)
                                                 <p class="text-start text-muted mb-0">Masa Kerja:</p>
                                                 <p class="text-start text-success mb-0">{{ number_format($salary['value'],1,'.',',') }} bulan</p>
@@ -119,7 +148,25 @@
                                         </td>
                                         @endforeach
                                         <td align="right">
-                                            <span class="subtotal-salary" data-user="{{ $user->id }}">{{ number_format($user->totalSalary,0,',',',') }}</span>
+                                            <span class="subtotal-salary" data-user="{{ $user->id }}">{{ number_format($user->subtotalSalary,0,',',',') }}</span>
+                                        </td>
+                                        <td align="right">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="text" class="form-control user-late-fund" data-user="{{ $user->id }}" data-month="{{ $month }}" data-year="{{ $year }}" value="{{ number_format(late_fund($user->id, $month, $year),0,',',',') }}">
+                                            </div>
+                                            <hr class="my-1">
+                                            <p class="text-start text-muted mb-0">Terlambat:</p>
+                                            <p class="text-start text-success mb-0">{{ number_format(late($user->id),0,',',',') }}x</p>
+                                        </td>
+                                        <td align="right">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">Rp</span>
+                                                <input type="text" class="form-control user-debt-fund" data-user="{{ $user->id }}" data-month="{{ $month }}" data-year="{{ $year }}" value="{{ number_format(debt_fund($user->id, $month, $year),0,',',',') }}">
+                                            </div>
+                                        </td>
+                                        <td align="right">
+                                            <span class="total-salary" data-user="{{ $user->id }}">{{ number_format($user->totalSalary,0,',',',') }}</span>
                                         </td>
                                     @endif
                                     <td align="center">
@@ -194,18 +241,73 @@
     $(document).on("change", ".user-indicator", function() {
         var user = $(this).data("user");
         var category = $(this).data("category");
+        var month = $(this).data("month");
+        var year = $(this).data("year");
         var value = $(this).val();
+        if(value < 0) {
+            $(this).val(0);
+            return;
+        }
         $.ajax({
             type: "post",
-            url: "{{ route('admin.user.update-value') }}",
-            data: {_token: "{{ csrf_token() }}", user: user, category: category, value: value},
+            url: "{{ route('admin.summary.salary.update.indicator') }}",
+            data: {_token: "{{ csrf_token() }}", user: user, category: category, month: month, year: year, value: value},
             success: function(response) {
                 $(".amount-indicator[data-user=" + user + "][data-category=" + category + "]").text(response.amount);
                 $(".subtotal-salary[data-user=" + user + "]").text(response.total);
-                console.log(response);
             }
         });
     });
+
+    // Change the User Late Fund
+    $(document).on("keyup", ".user-late-fund", function() {
+        var user = $(this).data("user");
+        var month = $(this).data("month");
+        var year = $(this).data("year");
+        var value = $(this).val().replace(",","").toString();
+        $.ajax({
+            type: "post",
+            url: "{{ route('admin.summary.salary.update.late-fund') }}",
+            data: {_token: "{{ csrf_token() }}", user: user, month: month, year: year, amount: value},
+            success: function(response) {
+                $(".total-salary[data-user=" + user + "]").text(response.total);
+            }
+        });
+        $(this).val(rupiah(value));
+    });
+
+    // Change the User Debt Fund
+    $(document).on("keyup", ".user-debt-fund", function() {
+        var user = $(this).data("user");
+        var month = $(this).data("month");
+        var year = $(this).data("year");
+        var value = $(this).val().replace(",","").toString();
+        $.ajax({
+            type: "post",
+            url: "{{ route('admin.summary.salary.update.debt-fund') }}",
+            data: {_token: "{{ csrf_token() }}", user: user, month: month, year: year, amount: value},
+            success: function(response) {
+                $(".total-salary[data-user=" + user + "]").text(response.total);
+            }
+        });
+        $(this).val(rupiah(value));
+    });
+
+    // Rupiah
+    function rupiah(value) {
+        var number_string = value.replace(/[^.\d]/g, '').toString();
+        var split = number_string.split('.');
+        var mod = split[0].length % 3;
+        var rupiah = split[0].substr(0, mod);
+        var thousand = split[0].substr(mod).match(/\d{3}/gi);
+
+        if(thousand) {
+            separator = mod ? ',' : '';
+            rupiah += separator + thousand.join(',');
+        }
+
+        return rupiah = split[1] != undefined ? rupiah + '.' + split[1] : rupiah;
+    }
 </script>
 
 @endsection

@@ -42,7 +42,7 @@
                                 <th width="150">Tipe</th>
                                 <th width="80">Indikator</th>
                                 <th width="80">Dikalikan dengan Kehadiran</th>
-                                @if(Auth::user()->role_id == role('super-admin'))
+                                @if(Auth::user()->role_id == role('super-admin') && Request::query('group') == null)
                                 <th width="150">Perusahaan</th>
                                 @endif
                                 <th width="40">Opsi</th>
@@ -64,8 +64,16 @@
                                     @endif
                                 </td>
                                 <td>{{ number_format($category->indicators()->count(),0,',',',') }}</td>
-                                <td><span class="badge {{ $category->multiplied_by_attendances == 1 ? 'bg-success' : 'bg-danger' }}">{{ $category->multiplied_by_attendances == 1 ? 'Ya' : 'Tidak' }}</span></td>
-                                @if(Auth::user()->role_id == role('super-admin'))
+                                <td>
+                                    @if($category->multiplied_by_attendances == 0)
+                                        Tidak
+                                    @elseif($category->multiplied_by_attendances == 99)
+                                        Ya, Dengan Semua Kehadiran
+                                    @else
+                                        {{ \App\Models\WorkHourCategory::find($category->multiplied_by_attendances)->name ?? '' }}
+                                    @endif
+                                </td>
+                                @if(Auth::user()->role_id == role('super-admin') && Request::query('group') == null)
                                 <td>
                                     @if($category->group)
                                         <a href="{{ route('admin.group.detail', ['id' => $category->group->id]) }}">{{ $category->group->name }}</a>

@@ -14,7 +14,7 @@ class SalaryCategory extends Model
      *
      * @var string
      */
-    protected $table = 'salary_categories';
+    protected $table = 'salary__categories';
 
     /**
      * Fill the model with an array of attributes.

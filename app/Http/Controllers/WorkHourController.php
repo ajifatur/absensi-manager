@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\WorkHour;
 use App\Models\Group;
 use App\Models\User;
+use App\Models\WorkHourCategory;
 
 class WorkHourController extends Controller
 {
@@ -57,9 +58,13 @@ class WorkHourController extends Controller
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
+        // Get categories
+        $categories = WorkHourCategory::orderBy('name','asc')->get();
+
         // View
         return view('admin/work-hour/create', [
-            'groups' => $groups
+            'groups' => $groups,
+            'categories' => $categories
         ]);
     }
 
@@ -77,6 +82,7 @@ class WorkHourController extends Controller
             'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
             'office_id' => 'required',
             'position_id' => 'required',
+            'category_id' => 'required',
             'quota' => 'required|numeric',
             'start_at' => 'required',
             'end_at' => 'required',
@@ -93,6 +99,7 @@ class WorkHourController extends Controller
             $work_hour->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $work_hour->office_id = $request->office_id;
             $work_hour->position_id = $request->position_id;
+            $work_hour->category_id = $request->category_id;
             $work_hour->name = $request->name;
             $work_hour->category = 0;
             $work_hour->quota = $request->quota;
@@ -119,10 +126,14 @@ class WorkHourController extends Controller
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
+        // Get categories
+        $categories = WorkHourCategory::orderBy('name','asc')->get();
+
         // View
         return view('admin/work-hour/edit', [
             'work_hour' => $work_hour,
             'groups' => $groups,
+            'categories' => $categories,
         ]);
     }
 
@@ -139,6 +150,7 @@ class WorkHourController extends Controller
             'name' => 'required|max:255',
             'office_id' => 'required',
             'position_id' => 'required',
+            'category_id' => 'required',
             'quota' => 'required|numeric',
             'start_at' => 'required',
             'end_at' => 'required',
@@ -155,6 +167,7 @@ class WorkHourController extends Controller
             $work_hour->name = $request->name;
             $work_hour->office_id = $request->office_id;
             $work_hour->position_id = $request->position_id;
+            $work_hour->category_id = $request->category_id;
             $work_hour->quota = $request->quota;
             $work_hour->start_at = $request->start_at.':00';
             $work_hour->end_at = $request->end_at.':00';

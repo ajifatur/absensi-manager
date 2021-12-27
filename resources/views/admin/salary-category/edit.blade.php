@@ -66,14 +66,13 @@
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Dikalikan dengan Kehadiran <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="multiplied_by_attendances" id="multiplied_by_attendances-1" value="1" {{ $salary_category->multiplied_by_attendances == '1' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="multiplied_by_attendances-1">Ya</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="multiplied_by_attendances" id="multiplied_by_attendances-0" value="0" {{ $salary_category->multiplied_by_attendances == '0' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="multiplied_by_attendances-0">Tidak</label>
-                            </div>
+                            <select name="multiplied_by_attendances" class="form-select form-select-sm {{ $errors->has('multiplied_by_attendances') ? 'border-danger' : '' }}">
+                                <option value="0">Tidak</option>
+                                <option value="99">Ya, Dengan Semua Kehadiran</option>
+                                @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ $salary_category->multiplied_by_attendances == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                @endforeach
+                            </select>
                             @if($errors->has('multiplied_by_attendances'))
                             <div class="small text-danger">{{ $errors->first('multiplied_by_attendances') }}</div>
                             @endif

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\SalaryCategory;
 use App\Models\SalaryIndicator;
 use App\Models\Group;
+use App\Models\WorkHourCategory;
 
 class SalaryCategoryController extends Controller
 {
@@ -55,9 +56,13 @@ class SalaryCategoryController extends Controller
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
+        // Get categories
+        $categories = WorkHourCategory::orderBy('name','asc')->get();
+
         // View
         return view('admin/salary-category/create', [
-            'groups' => $groups
+            'groups' => $groups,
+            'categories' => $categories
         ]);
     }
 
@@ -112,10 +117,14 @@ class SalaryCategoryController extends Controller
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
+        // Get categories
+        $categories = WorkHourCategory::orderBy('name','asc')->get();
+
         // View
         return view('admin/salary-category/edit', [
             'salary_category' => $salary_category,
             'groups' => $groups,
+            'categories' => $categories,
         ]);
     }
 
