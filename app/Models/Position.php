@@ -30,6 +30,22 @@ class Position extends Model
     {
         return $this->hasMany(\App\Models\User::class);
     }
+
+    /**
+     * Get the job duties & responsibilities for the position.
+     */
+    public function duties_and_responsibilities()
+    {
+        return $this->hasMany(\App\Models\JobDutyResponsibility::class);
+    }
+
+    /**
+     * Get the job authorities for the position.
+     */
+    public function authorities()
+    {
+        return $this->hasMany(\App\Models\JobAuthority::class);
+    }
     
     /**
      * Get the group that owns the office.

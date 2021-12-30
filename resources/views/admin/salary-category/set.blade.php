@@ -109,6 +109,7 @@
     $(window).on("load", function() {
         var length = $(".table tbody tr").length;
         if(length == 0) $(".table tbody").append(starter_html());
+        Spandiv.Tooltip();
     })
 
     // Button Add Row

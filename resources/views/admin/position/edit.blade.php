@@ -40,6 +40,53 @@
                     </div>
                     @endif
                     <hr>
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Tugas dan Tanggung Jawab</label>
+                        <div class="col-lg-10 col-md-9">
+                            <table class="table table-sm table-bordered" id="table-dr">
+                                <tbody>
+                                    @foreach($position->duties_and_responsibilities as $key=>$dr)
+                                    <tr data-id="{{ $key }}">
+                                        <td>
+                                            <textarea name="dr_names[]" class="form-control form-control-sm" rows="2">{{ $dr->name }}</textarea>
+                                        </td>
+                                        <td width="80" align="center">
+                                            <input type="hidden" name="dr_ids[]" value="{{ $dr->id }}">
+                                            <div class="btn-group">
+                                                <a href="#" class="btn btn-success btn-sm btn-add-row" data-id="{{ $key }}" data-bs-toggle="tooltip" title="Tambah"><i class="bi-plus"></i></a>
+                                                <a href="#" class="btn btn-danger btn-sm btn-delete-row" data-id="{{ $key }}" data-bs-toggle="tooltip" title="Hapus"><i class="bi-trash"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Wewenang</label>
+                        <div class="col-lg-10 col-md-9">
+                            <table class="table table-sm table-bordered" id="table-a">
+                                <tbody>
+                                    @foreach($position->authorities as $key=>$a)
+                                    <tr data-id="{{ $key }}">
+                                        <td>
+                                            <textarea name="a_names[]" class="form-control form-control-sm" rows="2">{{ $a->name }}</textarea>
+                                        </td>
+                                        <td width="80" align="center">
+                                            <input type="hidden" name="a_ids[]" value="{{ $a->id }}">
+                                            <div class="btn-group">
+                                                <a href="#" class="btn btn-success btn-sm btn-add-row" data-id="{{ $key }}" data-bs-toggle="tooltip" title="Tambah"><i class="bi-plus"></i></a>
+                                                <a href="#" class="btn btn-danger btn-sm btn-delete-row" data-id="{{ $key }}" data-bs-toggle="tooltip" title="Hapus"><i class="bi-trash"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr>
                     <div class="row">
                         <div class="col-lg-2 col-md-3"></div>
                         <div class="col-lg-10 col-md-9">
@@ -52,5 +99,88 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('js')
+
+<script type="text/javascript">
+    // Load
+    $(window).on("load", function() {
+        var length = $("#table-dr tbody tr").length;
+        if(length == 0) $("#table-dr tbody").append(starter_html());
+        var length_a = $("#table-a tbody tr").length;
+        if(length_a == 0) $("#table-a tbody").append(starter_html_a());
+        Spandiv.Tooltip();
+    })
+
+    // Button Add Row
+    $(document).on("click", ".btn-add-row", function(e) {
+        e.preventDefault();
+        var id = $(this).parents(".table").attr("id");
+        if(id == "table-dr") $(this).parents(".table").find("tbody").append(starter_html());
+        else if(id == "table-a") $(this).parents(".table").find("tbody").append(starter_html_a());
+        recreate();
+    });
+
+    // Button Delete Row
+    $(document).on("click", ".btn-delete-row", function(e) {
+        e.preventDefault();
+        var id = $(this).data("id");
+        var length = $(this).parents(".table").find("tbody tr").length;
+        var ask = confirm("Anda yakin ingin menghapus data ini?");
+        if(ask) {
+            if(length > 1) $(this).parents(".table").find("tbody tr[data-id="+id+"]").remove();
+            else {
+                $(this).parents(".table").find("tbody tr[data-id="+id+"]").find("input, textarea").val(null);
+            }
+            recreate();
+        }
+    });
+
+    // Starter HTML
+    function starter_html() {
+        var html = '';
+        html += '<tr data-id="0">';
+        html += '<td>';
+        html += '<textarea name="dr_names[]" class="form-control form-control-sm" rows="2"></textarea>';
+        html += '</td>';
+        html += '<td width="80" align="center">';
+        html += '<input type="hidden" name="dr_ids[]">';
+        html += '<div class="btn-group">';
+        html += '<a href="#" class="btn btn-success btn-sm btn-add-row" data-id="0" data-bs-toggle="tooltip" title="Tambah"><i class="bi-plus"></i></a>';
+        html += '<a href="#" class="btn btn-danger btn-sm btn-delete-row" data-id="0" data-bs-toggle="tooltip" title="Hapus"><i class="bi-trash"></i></a>';
+        html += '</div>';
+        html += '</td>';
+        html += '</tr>';
+        return html;
+    }
+    function starter_html_a() {
+        var html = '';
+        html += '<tr data-id="0">';
+        html += '<td>';
+        html += '<textarea name="a_names[]" class="form-control form-control-sm" rows="2"></textarea>';
+        html += '</td>';
+        html += '<td width="80" align="center">';
+        html += '<input type="hidden" name="a_ids[]">';
+        html += '<div class="btn-group">';
+        html += '<a href="#" class="btn btn-success btn-sm btn-add-row" data-id="0" data-bs-toggle="tooltip" title="Tambah"><i class="bi-plus"></i></a>';
+        html += '<a href="#" class="btn btn-danger btn-sm btn-delete-row" data-id="0" data-bs-toggle="tooltip" title="Hapus"><i class="bi-trash"></i></a>';
+        html += '</div>';
+        html += '</td>';
+        html += '</tr>';
+        return html;
+    }
+
+    // Recreate data-id
+    function recreate() {
+        $(".table tbody tr").each(function(key,elem) {
+            $(elem).attr("data-id",key);
+            $(elem).find(".btn-add-row").attr("data-id",key);
+            $(elem).find(".btn-delete-row").attr("data-id",key);
+        });
+        Spandiv.Tooltip();
+    }
+</script>
 
 @endsection

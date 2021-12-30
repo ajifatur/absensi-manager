@@ -38,6 +38,8 @@
                             <tr>
                                 <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
                                 <th>Nama</th>
+                                <th width="80">Tugas dan Tanggung Jawab</th>
+                                <th width="80">Wewenang</th>
                                 <th width="80">Karyawan</th>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <th width="150">Perusahaan</th>
@@ -50,6 +52,8 @@
                             <tr>
                                 <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
                                 <td><a href="{{ route('admin.position.detail', ['id' => $position->id]) }}">{{ $position->name }}</a></td>
+                                <td align="right">{{ number_format($position->duties_and_responsibilities()->count(),0,',',',') }}</td>
+                                <td align="right">{{ number_format($position->authorities()->count(),0,',',',') }}</td>
                                 <td align="right">{{ number_format($position->users()->where('role_id','=',role('member'))->where('end_date','=',null)->count(),0,',',',') }}</td>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <td>
