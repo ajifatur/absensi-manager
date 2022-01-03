@@ -100,12 +100,12 @@ class PositionController extends Controller
             }
 
             // Save or update duties & responsibilities
-            foreach($request->dr_ids as $key=>$id) {
-                $dr = JobDutyResponsibility::find($id);
+            foreach(array_filter($request->dr_names) as $key=>$name) {
+                $dr = JobDutyResponsibility::find($request->dr_ids[$key]);
                 if(!$dr) $dr = new JobDutyResponsibility;
     
                 $dr->position_id = $position->id;
-                $dr->name = $request->dr_names[$key];
+                $dr->name = $name;
                 $dr->save();
             }
 
@@ -119,12 +119,12 @@ class PositionController extends Controller
             }
 
             // Save or update authorities
-            foreach($request->a_ids as $key=>$id) {
-                $a = JobAuthority::find($id);
+            foreach(array_filter($request->a_names) as $key=>$name) {
+                $a = JobAuthority::find($request->a_ids[$key]);
                 if(!$a) $a = new JobAuthority;
     
                 $a->position_id = $position->id;
-                $a->name = $request->a_names[$key];
+                $a->name = $name;
                 $a->save();
             }
 
@@ -207,12 +207,12 @@ class PositionController extends Controller
             }
 
             // Save or update duties & responsibilities
-            foreach(array_filter($request->dr_ids) as $key=>$id) {
-                $dr = JobDutyResponsibility::find($id);
+            foreach(array_filter($request->dr_names) as $key=>$name) {
+                $dr = JobDutyResponsibility::find($request->dr_ids[$key]);
                 if(!$dr) $dr = new JobDutyResponsibility;
     
                 $dr->position_id = $position->id;
-                $dr->name = $request->dr_names[$key];
+                $dr->name = $name;
                 $dr->save();
             }
 
@@ -226,12 +226,12 @@ class PositionController extends Controller
             }
 
             // Save or update authorities
-            foreach(array_filter($request->a_ids) as $key=>$id) {
-                $a = JobAuthority::find($id);
+            foreach(array_filter($request->a_names) as $key=>$name) {
+                $a = JobAuthority::find($request->a_ids[$key]);
                 if(!$a) $a = new JobAuthority;
     
                 $a->position_id = $position->id;
-                $a->name = $request->a_names[$key];
+                $a->name = $name;
                 $a->save();
             }
 
