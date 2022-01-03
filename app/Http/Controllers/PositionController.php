@@ -207,7 +207,7 @@ class PositionController extends Controller
             }
 
             // Save or update duties & responsibilities
-            foreach($request->dr_ids as $key=>$id) {
+            foreach(array_filter($request->dr_ids) as $key=>$id) {
                 $dr = JobDutyResponsibility::find($id);
                 if(!$dr) $dr = new JobDutyResponsibility;
     
@@ -216,7 +216,7 @@ class PositionController extends Controller
                 $dr->save();
             }
 
-            // Compare and authorities
+            // Compare and delete authorities
             $array_diff = array_diff($position->authorities()->pluck('id')->toArray(), array_filter($request->a_ids));
             if(count($array_diff) > 0) {
                 foreach($array_diff as $idx) {
@@ -226,7 +226,7 @@ class PositionController extends Controller
             }
 
             // Save or update authorities
-            foreach($request->a_ids as $key=>$id) {
+            foreach(array_filter($request->a_ids) as $key=>$id) {
                 $a = JobAuthority::find($id);
                 if(!$a) $a = new JobAuthority;
     
