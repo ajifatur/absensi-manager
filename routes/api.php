@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Ajifatur\Helpers\RouteExt;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +24,6 @@ Route::get('/office', 'OfficeController@index')->name('api.office.index');
 Route::get('/position', 'PositionController@index')->name('api.position.index');
 Route::get('/work-hour', 'WorkHourController@index')->name('api.work-hour.index');
 Route::get('/salary-category', 'SalaryCategoryController@index')->name('api.salary-category.index');
+
+// FaturHelper Routes
+RouteExt::api();
