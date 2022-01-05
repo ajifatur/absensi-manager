@@ -121,6 +121,7 @@ RouteExt::login();
 RouteExt::logout();
 RouteExt::dashboard();
 RouteExt::user();
+RouteExt::menu();
 
 
 // $routes = collect(Route::getRoutes())->map(function($route) {
