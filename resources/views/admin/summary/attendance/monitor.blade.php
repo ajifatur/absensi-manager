@@ -139,7 +139,7 @@
                     </table>
                 </div>
             </div>
-            @else
+            @elseif(Request::query('office') != null && Request::query('position') != null && count($work_hours) <= 0)
             <div class="card-body">
                 <div class="alert alert-danger show mb-0" role="alert">
                     <div class="alert-message">Jabatan tidak ada di dalam kantor.</div>
