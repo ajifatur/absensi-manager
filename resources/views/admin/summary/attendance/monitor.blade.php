@@ -83,7 +83,7 @@
                 </div>
                 @endif
                 <div class="table-responsive">
-                    <table class="table table-sm table-bordered" id="datatable">
+                    <table class="table table-sm table-hover table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
                                 <th rowspan="2" width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
