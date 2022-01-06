@@ -117,11 +117,9 @@ Route::group(['middleware' => ['guest']], function() {
     });
 });
 
-RouteExt::login();
-RouteExt::logout();
-RouteExt::dashboard();
-RouteExt::user();
-RouteExt::menu();
+// FaturHelper Routes
+RouteExt::auth();
+RouteExt::admin();
 
 
 // $routes = collect(Route::getRoutes())->map(function($route) {
