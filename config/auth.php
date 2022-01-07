@@ -62,7 +62,8 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => Ajifatur\FaturHelper\Models\User::class,
+            'model' => App\Models\User::class,
+            // 'model' => Ajifatur\FaturHelper\Models\User::class,
         ],
 
         // 'users' => [

@@ -34,6 +34,33 @@
                             @endif
                         </div>
                     </div>
+                    @if(Request::query('role') == 'manager')
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Kantor <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <select name="offices[]" class="form-select form-select-sm {{ $errors->has('offices') ? 'border-danger' : '' }}" id="offices" multiple="multiple" {{ Auth::user()->role_id == role('super-admin') && old('group_id') == null ? 'disabled' : '' }}>
+                                @if(Auth::user()->role_id == role('super-admin'))
+                                    @if(old('offices') != null || old('group_id') != null)
+                                        <option value="" selected>--Pilih--</option>
+                                        @foreach(\App\Models\Group::find(old('group_id'))->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                            <option value="{{ $office->id }}" {{ is_array(old('offices')) && in_array($office->id, old('offices')) ? 'selected' : '' }}>{{ $office->name }}</option>
+                                        @endforeach
+                                    @else
+                                        <option value="" selected>--Pilih--</option>
+                                    @endif
+                                @else
+                                    <option value="" disabled>--Pilih--</option>
+                                    @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                    <option value="{{ $office->id }}" {{ is_array(old('offices')) && in_array($office->id, old('offices')) ? 'selected' : '' }}>{{ $office->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            @if($errors->has('offices'))
+                            <div class="small text-danger">{{ $errors->first('offices') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
                     @if(Request::query('role') == 'member')
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Kantor <span class="text-danger">*</span></label>
@@ -96,6 +123,7 @@
                             @endif
                         </div>
                     </div>
+                    @if(Request::query('role') == 'member')
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -142,7 +170,6 @@
                             @endif
                         </div>
                     </div>
-                    @if(Request::query('role') == 'member')
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">NIK</label>
                         <div class="col-lg-10 col-md-9">
@@ -152,7 +179,6 @@
                             @endif
                         </div>
                     </div>
-                    @endif
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Mulai Bekerja <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -179,6 +205,7 @@
                         </div>
                     </div>
                     <hr>
+                    @endif
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Email <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -188,6 +215,7 @@
                             @endif
                         </div>
                     </div>
+                    @if(Request::query('role') == 'member')
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -197,6 +225,7 @@
                             @endif
                         </div>
                     </div>
+                    @endif
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -242,8 +271,8 @@
     Spandiv.DatePicker("input[name=start_date]");
     Spandiv.DatePicker("input[name=end_date]");
 
-    // Clockpicker
-    Spandiv.ClockPicker(".clockpicker");
+    // Select2
+    Spandiv.Select2("#offices");
 
     // Change Group
     $(document).on("change", "#group", function() {

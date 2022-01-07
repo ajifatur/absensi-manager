@@ -30,6 +30,9 @@ class WorkHourController extends Controller
             }
         }
 
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get work hours
         if(Auth::user()->role_id == role('super-admin')) {
             $group = Group::find($request->query('group'));
@@ -55,6 +58,9 @@ class WorkHourController extends Controller
      */
     public function create()
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
@@ -89,11 +95,11 @@ class WorkHourController extends Controller
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Save the work_hour
             $work_hour = new WorkHour;
             $work_hour->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
@@ -120,6 +126,9 @@ class WorkHourController extends Controller
      */
     public function edit($id)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the work hour
         $work_hour = WorkHour::findOrFail($id);
 
@@ -157,11 +166,11 @@ class WorkHourController extends Controller
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Update the work hour
             $work_hour = WorkHour::find($request->id);
             $work_hour->name = $request->name;
@@ -186,6 +195,9 @@ class WorkHourController extends Controller
      */
     public function delete(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+        
         // Get the work hour
         $work_hour = WorkHour::findOrFail($request->id);
 

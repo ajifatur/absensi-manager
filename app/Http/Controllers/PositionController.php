@@ -28,6 +28,9 @@ class PositionController extends Controller
             return response()->json($positions);
         }
 
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get positions
         if(Auth::user()->role_id == role('super-admin')) {
             $group = Group::find($request->query('group'));
@@ -53,6 +56,9 @@ class PositionController extends Controller
      */
     public function create()
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
@@ -141,6 +147,9 @@ class PositionController extends Controller
      */
     public function detail($id)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the position
         $position = Position::findOrFail($id);
 
@@ -158,6 +167,9 @@ class PositionController extends Controller
      */
     public function edit($id)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the position
         $position = Position::findOrFail($id);
 
@@ -247,7 +259,10 @@ class PositionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function delete(Request $request)
-    {        
+    {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the position
         $position = Position::find($request->id);
 

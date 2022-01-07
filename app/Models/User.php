@@ -8,9 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends \Ajifatur\FaturHelper\Models\User
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    // use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -85,5 +85,13 @@ class User extends Authenticatable
     public function debt_funds()
     {
         return $this->hasMany(\App\Models\UserDebtFund::class);
+    }
+
+    /**
+     * The offices that belong to the manager.
+     */
+    public function managed_offices()
+    {
+        return $this->belongsToMany(Office::class, 'user__office', 'user_id', 'office_id');
     }
 }

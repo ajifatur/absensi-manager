@@ -148,18 +148,18 @@ class UserController extends Controller
         // Validation
         $validator = Validator::make($request->all(), [
             'group_id' => Auth::user()->role_id == role('super-admin') ? 'required' : '',
-            'office_id' => !in_array($request->role_id, [role('admin'), role('manager')]) ? 'required' : '',
-            'position_id' => !in_array($request->role_id, [role('admin'), role('manager')]) ? 'required' : '',
+            'office_id' => $request->role_id == role('member') ? 'required' : '',
+            'position_id' => $request->role_id == role('member') ? 'required' : '',
+            'offices' => $request->role_id == role('manager') ? 'required' : '',
             'name' => 'required|max:200',
-            'birthdate' => 'required',
-            'gender' => 'required',
-            'address' => 'required',
-            'start_date' => 'required',
-            'phone_number' => 'required|numeric',
+            'birthdate' => $request->role_id == role('member') ? 'required' : '',
+            'gender' => $request->role_id == role('member') ? 'required' : '',
+            'address' => $request->role_id == role('member') ? 'required' : '',
+            'start_date' => $request->role_id == role('member') ? 'required' : '',
+            'phone_number' => $request->role_id == role('member') ? 'required|numeric' : '',
             'email' => 'required|email|unique:users',
             'username' => 'required|alpha_dash|min:4|unique:users',
             'password' => 'required|min:6',
-            // 'status' => 'required'
         ]);
         
         // Check errors
@@ -170,26 +170,30 @@ class UserController extends Controller
         else {
             // Save the user
             $user = new User;
-            $user->role_id = Auth::user()->role_id == role('manager') ? role('member') : $request->role_id;
+            $user->role_id = $request->role_id;
             $user->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
-            $user->office_id = !in_array($request->role_id, [role('admin'), role('manager')]) ? $request->office_id : 0;
-            $user->position_id = !in_array($request->role_id, [role('admin'), role('manager')]) ? $request->position_id : 0;
+            $user->office_id = $request->role_id == role('member') ? $request->office_id : 0;
+            $user->position_id = $request->role_id == role('member') ? $request->position_id : 0;
             $user->name = $request->name;
-            $user->birthdate = DateTimeExt::change($request->birthdate);
-            $user->gender = $request->gender;
-            $user->address = $request->address;
-            $user->start_date = DateTimeExt::change($request->start_date);
+            $user->birthdate = $request->role_id == role('member') ? DateTimeExt::change($request->birthdate) : null;
+            $user->gender = $request->role_id == role('member') ? $request->gender : '';
+            $user->address = $request->role_id == role('member') ? $request->address : '';
+            $user->start_date = $request->role_id == role('member') ? DateTimeExt::change($request->start_date) : null;
             $user->end_date = $request->end_date != '' ? DateTimeExt::change($request->end_date) : null;
-            $user->phone_number = $request->phone_number;
-            $user->identity_number = !in_array($request->role_id, [role('admin'), role('manager')]) ? $request->identity_number : '';
+            $user->phone_number = $request->role_id == role('member') ? $request->phone_number : '';
+            $user->identity_number = $request->role_id == role('member') ? $request->identity_number : '';
             $user->latest_education = $request->latest_education;
             $user->email = $request->email;
             $user->username = $request->username;
             $user->password = bcrypt($request->password);
             $user->status = 1;
-            // $user->status = $request->status;
             $user->last_visit = null;
             $user->save();
+
+            // If manager, attach offices
+            if($user->role_id == role('manager')) {
+                $user->managed_offices()->attach($request->offices);
+            }
 
             // Get the role
             $role = Role::find($user->role_id);
@@ -251,12 +255,13 @@ class UserController extends Controller
     {
         // Validation
         $validator = Validator::make($request->all(), [
-            'office_id' => !in_array($request->role_id, [role('admin'), role('manager')]) ? 'required' : '',
-            'position_id' => !in_array($request->role_id, [role('admin'), role('manager')]) ? 'required' : '',
+            'office_id' => $request->role_id == role('member') ? 'required' : '',
+            'position_id' => $request->role_id == role('member') ? 'required' : '',
+            'offices' => $request->role_id == role('manager') ? 'required' : '',
             'name' => 'required|max:200',
-            'birthdate' => 'required',
-            'gender' => 'required',
-            'phone_number' => 'required|numeric',
+            'birthdate' => $request->role_id == role('member') ? 'required' : '',
+            'gender' => $request->role_id == role('member') ? 'required' : '',
+            'phone_number' => $request->role_id == role('member') ? 'required|numeric' : '',
             'email' => [
                 'required', 'email', Rule::unique('users')->ignore($request->id, 'id')
             ],
@@ -264,7 +269,6 @@ class UserController extends Controller
                 'required', 'alpha_dash', 'min:4', Rule::unique('users')->ignore($request->id, 'id')
             ],
             'password' => $request->password != '' ? 'min:6' : '',
-            // 'status' => 'required'
         ]);
         
         // Check errors
@@ -278,19 +282,23 @@ class UserController extends Controller
             $user->office_id = $request->office_id;
             $user->position_id = $request->position_id;
             $user->name = $request->name;
-            $user->birthdate = DateTimeExt::change($request->birthdate);
-            $user->gender = $request->gender;
-            $user->address = $request->address;
-            $user->start_date = DateTimeExt::change($request->start_date);
+            $user->birthdate = $request->role_id == role('member') ? DateTimeExt::change($request->birthdate) : null;
+            $user->gender = $request->role_id == role('member') ? $request->gender : '';
+            $user->address = $request->role_id == role('member') ? $request->address : '';
+            $user->start_date = $request->role_id == role('member') ? DateTimeExt::change($request->start_date) : null;
             $user->end_date = $request->end_date != '' ? DateTimeExt::change($request->end_date) : null;
-            $user->phone_number = $request->phone_number;
+            $user->phone_number = $request->role_id == role('member') ? $request->phone_number : '';
             $user->latest_education = $request->latest_education;
-            $user->identity_number = !in_array($request->role_id, [role('admin'), role('manager')]) ? $request->identity_number : '';
+            $user->identity_number = $request->role_id == role('member') ? $request->identity_number : '';
             $user->email = $request->email;
             $user->username = $request->username;
             $user->password = $request->password != '' ? bcrypt($request->password) : $user->password;
-            // $user->status = $request->status;
             $user->save();
+
+            // If manager, sync offices
+            if($user->role_id == role('manager')) {
+                $user->managed_offices()->sync($request->offices);
+            }
 
             // Get the role
             $role = Role::find($user->role_id);

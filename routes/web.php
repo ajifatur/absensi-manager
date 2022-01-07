@@ -121,7 +121,6 @@ Route::group(['middleware' => ['guest']], function() {
 RouteExt::auth();
 RouteExt::admin();
 
-
 // $routes = collect(Route::getRoutes())->map(function($route) {
 // 	return $route->uri();
 // });

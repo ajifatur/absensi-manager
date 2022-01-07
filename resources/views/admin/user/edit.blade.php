@@ -29,6 +29,22 @@
                             @endif
                         </div>
                     </div>
+                    @if($user->role_id == role('manager'))
+                    <div class="row mb-3">
+                        <label class="col-lg-2 col-md-3 col-form-label">Kantor <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <select name="offices[]" class="form-select form-select-sm {{ $errors->has('offices') ? 'border-danger' : '' }}" id="offices" multiple="multiple">
+                                <option value="" disabled>--Pilih--</option>
+                                @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                <option value="{{ $office->id }}" {{ in_array($office->id, $user->managed_offices()->pluck('office_id')->toArray()) ? 'selected' : '' }}>{{ $office->name }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('offices'))
+                            <div class="small text-danger">{{ $errors->first('offices') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
                     @if($user->role_id == role('member'))
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Kantor <span class="text-danger">*</span></label>
@@ -69,6 +85,7 @@
                             @endif
                         </div>
                     </div>
+                    @if($user->role_id == role('member'))
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -115,7 +132,6 @@
                             @endif
                         </div>
                     </div>
-                    @if($user->role_id == role('member'))
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">NIK</label>
                         <div class="col-lg-10 col-md-9">
@@ -125,7 +141,6 @@
                             @endif
                         </div>
                     </div>
-                    @endif
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Mulai Bekerja <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -152,6 +167,7 @@
                         </div>
                     </div>
                     <hr>
+                    @endif
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Email <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -161,6 +177,7 @@
                             @endif
                         </div>
                     </div>
+                    @if($user->role_id == role('member'))
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">No. HP <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -170,6 +187,7 @@
                             @endif
                         </div>
                     </div>
+                    @endif
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Username <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
@@ -216,8 +234,8 @@
     Spandiv.DatePicker("input[name=start_date]");
     Spandiv.DatePicker("input[name=end_date]");
 
-    // Clockpicker
-    Spandiv.ClockPicker(".clockpicker");
+    // Select2
+    Spandiv.Select2("#offices");
 
     // Change Group
     $(document).on("change", "#group", function() {

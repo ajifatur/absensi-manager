@@ -24,6 +24,9 @@ class AttendanceController extends Controller
      */
     public function index(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         if(Auth::user()->role_id == role('super-admin')) {
             // Set params
             $group = $request->query('group') != null ? $request->query('group') : 0;
@@ -52,7 +55,7 @@ class AttendanceController extends Controller
                 'groups' => $groups,
             ]);
         }
-        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
+        elseif(Auth::user()->role_id == role('admin')) {
             // Set params
             $group = Auth::user()->group_id;
             $office = $request->query('office') != null ? $request->query('office') : 0;
@@ -74,6 +77,33 @@ class AttendanceController extends Controller
                 'attendances' => $attendances,
             ]);
         }
+        elseif(Auth::user()->role_id == role('manager')) {
+            // Get the user
+            $user = User::findOrFail(Auth::user()->id);
+
+            // Set params
+            $group = Auth::user()->group_id;
+            $office = $request->query('office') != null ? $request->query('office') : 0;
+            $t1 = $request->query('t1') != null ? DateTimeExt::change($request->query('t1')) : date('Y-m-d');
+            $t2 = $request->query('t2') != null ? DateTimeExt::change($request->query('t2')) : date('Y-m-d');
+
+            // Get attendances
+            if($office == 0)
+                $attendances = Attendance::whereDate('date','>=',$t1)->whereDate('date','<=',$t2)->whereHas('user', function (Builder $query) use ($user, $group) {
+                    return $query->where('group_id','=',$group)->whereIn('office_id',$user->managed_offices()->pluck('office_id')->toArray());
+                })->get();
+            elseif(in_array($office, $user->managed_offices()->pluck('office_id')->toArray()))
+                $attendances = Attendance::whereDate('date','>=',$t1)->whereDate('date','<=',$t2)->whereHas('user', function (Builder $query) use ($group, $office) {
+                    return $query->where('group_id','=',$group)->where('office_id','=',$office);
+                })->get();
+            else
+                abort(403);
+
+            // View
+            return view('admin/attendance/index', [
+                'attendances' => $attendances,
+            ]);
+        }
     }
 
     /**
@@ -83,6 +113,9 @@ class AttendanceController extends Controller
      */
     public function create()
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
@@ -145,8 +178,37 @@ class AttendanceController extends Controller
      */
     public function edit($id)
     {
-        // Get the attendance
-        $attendance = Attendance::findOrFail($id);
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
+        if(Auth::user()->role_id == role('super-admin')) {
+            // Get the attendance
+            $attendance = Attendance::has('user')->findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('admin')) {
+            // Get the group
+            $group = Auth::user()->group_id;
+
+            // Get offices
+            $offices = Auth::user()->group->offices()->pluck('id')->toArray();
+
+            // Get the attendance
+            $attendance = Attendance::whereHas('user', function (Builder $query) use ($group, $offices) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$offices);
+            })->findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            // Get the group
+            $group = Auth::user()->group_id;
+
+            // Get offices
+            $offices = Auth::user()->managed_offices()->pluck('office_id')->toArray();
+
+            // Get the attendance
+            $attendance = Attendance::whereHas('user', function (Builder $query) use ($group, $offices) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$offices);
+            })->findOrFail($id);
+        }
 
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
@@ -178,11 +240,11 @@ class AttendanceController extends Controller
         ]);
         
         // Check errors
-        if($validator->fails()){
+        if($validator->fails()) {
             // Back to form page with validation error messages
             return redirect()->back()->withErrors($validator->errors())->withInput();
         }
-        else{
+        else {
             // Get the work hour
             $work_hour = WorkHour::find($request->workhour_id);
 
@@ -210,8 +272,37 @@ class AttendanceController extends Controller
      */
     public function delete(Request $request)
     {
-        // Get the attendance
-        $attendance = Attendance::findOrFail($request->id);
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+        
+        if(Auth::user()->role_id == role('super-admin')) {
+            // Get the attendance
+            $attendance = Attendance::has('user')->findOrFail($request->id);
+        }
+        elseif(Auth::user()->role_id == role('admin')) {
+            // Get the group
+            $group = Auth::user()->group_id;
+
+            // Get offices
+            $offices = Auth::user()->group->offices()->pluck('id')->toArray();
+
+            // Get the attendance
+            $attendance = Attendance::whereHas('user', function (Builder $query) use ($group, $offices) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$offices);
+            })->findOrFail($request->id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            // Get the group
+            $group = Auth::user()->group_id;
+
+            // Get offices
+            $offices = Auth::user()->managed_offices()->pluck('office_id')->toArray();
+
+            // Get the attendance
+            $attendance = Attendance::whereHas('user', function (Builder $query) use ($group, $offices) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$offices);
+            })->findOrFail($request->id);
+        }
 
         // Delete the attendance
         $attendance->delete();

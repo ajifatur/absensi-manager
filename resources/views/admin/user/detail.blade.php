@@ -20,6 +20,7 @@
                         <span class="font-weight-bold">Perusahaan:</span>
                         <span>{{ $user->group ? $user->group->name : '-' }}</span>
                     </li>
+                    @if($user->role_id == role('member'))
                     <li class="list-group-item d-flex justify-content-between p-1">
                         <span class="font-weight-bold">Kantor:</span>
                         <span>{{ $user->office ? $user->office->name : '-' }}</span>
@@ -32,6 +33,7 @@
                         <span class="font-weight-bold">Status:</span>
                         <span class="badge {{ $user->end_date == null ? 'bg-success' : 'bg-danger' }}">{{ $user->end_date == null ? 'Aktif' : 'Tidak Aktif' }}</span>
                     </li>
+                    @endif
                 </ul>
             </div>
         </div>
@@ -44,6 +46,7 @@
                         <span class="font-weight-bold">Nama:</span>
                         <span>{{ $user->name }}</span>
                     </li>
+                    @if($user->role_id == role('member'))
                     <li class="list-group-item d-flex justify-content-between p-1">
                         <span class="font-weight-bold">Tanggal Lahir:</span>
                         <span>{{ date('d/m/Y', strtotime($user->birthdate)) }}</span>
@@ -64,6 +67,7 @@
                         <span class="font-weight-bold">Pendidikan Terakhir:</span>
                         <span>{{ $user->latest_education != '' ? $user->latest_education : '-' }}</span>
                     </li>
+                    @endif
                     <li class="list-group-item d-flex justify-content-between p-1">
                         <span class="font-weight-bold">Email:</span>
                         <span>{{ $user->email }}</span>

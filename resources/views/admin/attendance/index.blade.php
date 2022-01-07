@@ -27,13 +27,17 @@
                         <select name="office" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Kantor">
                             <option value="0">Semua Kantor</option>
                             @if(Auth::user()->role_id == role('super-admin'))
-                                @if(isset($_GET) && isset($_GET['group']) && $_GET['group'] != 0)
+                                @if(Request::query('group') != 0)
                                     @foreach(\App\Models\Group::find($_GET['group'])->offices as $office)
                                     <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                     @endforeach
                                 @endif
-                            @elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
+                            @elseif(Auth::user()->role_id == role('admin'))
                                 @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices as $office)
+                                <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
+                                @endforeach
+                            @elseif(Auth::user()->role_id == role('manager'))
+                                @foreach(Auth::user()->managed_offices as $office)
                                 <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                 @endforeach
                             @endif

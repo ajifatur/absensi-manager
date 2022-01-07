@@ -88,6 +88,9 @@
                                 <th width="80">NIK</th>
                                 @endif
                                 <th>Identitas</th>
+                                @if(Request::query('role') == 'manager')
+                                    <th width="150">Kantor</th>
+                                @endif
                                 @if(Request::query('role') == 'member')
                                     <th width="80">Tanggal Kontrak</th>
                                     <th width="150">Kantor</th>
@@ -116,6 +119,16 @@
                                         <br>
                                         <small class="text-muted">{{ $user->phone_number }}</small>
                                     </td>
+                                    @if(Request::query('role') == 'manager')
+                                    <td>
+                                        @foreach($user->managed_offices as $key=>$office)
+                                            <a href="{{ route('admin.office.detail', ['id' => $office->id]) }}">{{ $office->name }}</a>
+                                            @if($key < count($user->managed_offices)-1)
+                                            <hr class="my-1">
+                                            @endif
+                                        @endforeach
+                                    </td>
+                                    @endif
                                     @if(Request::query('role') == 'member')
                                         <td>
                                             <span class="d-none">{{ $user->end_date == null ? 1 : 0 }} {{ $user->start_date }}</span>

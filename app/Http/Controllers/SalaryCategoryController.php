@@ -28,6 +28,9 @@ class SalaryCategoryController extends Controller
             return response()->json($salary_categories);
         }
 
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get salary categories
         if(Auth::user()->role_id == role('super-admin')) {
             $group = Group::find($request->query('group'));
@@ -53,6 +56,9 @@ class SalaryCategoryController extends Controller
      */
     public function create()
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
@@ -111,6 +117,9 @@ class SalaryCategoryController extends Controller
      */
     public function edit($id)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the salary category
         $salary_category = SalaryCategory::findOrFail($id);
 
@@ -171,6 +180,9 @@ class SalaryCategoryController extends Controller
      */
     public function set($id)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+        
         // Get the salary category
         $salary_category = SalaryCategory::findOrFail($id);
 
@@ -225,6 +237,9 @@ class SalaryCategoryController extends Controller
      */
     public function delete(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+        
         // Get the salary category
         $salary_category = SalaryCategory::findOrFail($request->id);
 
