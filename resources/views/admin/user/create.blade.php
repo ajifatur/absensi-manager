@@ -39,17 +39,14 @@
                         <label class="col-lg-2 col-md-3 col-form-label">Kantor <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
                             <select name="offices[]" class="form-select form-select-sm {{ $errors->has('offices') ? 'border-danger' : '' }}" id="offices" multiple="multiple" {{ Auth::user()->role_id == role('super-admin') && old('group_id') == null ? 'disabled' : '' }}>
+                                <option value="" disabled>--Pilih--</option>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                     @if(old('offices') != null || old('group_id') != null)
-                                        <option value="" selected>--Pilih--</option>
                                         @foreach(\App\Models\Group::find(old('group_id'))->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                             <option value="{{ $office->id }}" {{ is_array(old('offices')) && in_array($office->id, old('offices')) ? 'selected' : '' }}>{{ $office->name }}</option>
                                         @endforeach
-                                    @else
-                                        <option value="" selected>--Pilih--</option>
                                     @endif
                                 @else
-                                    <option value="" disabled>--Pilih--</option>
                                     @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                     <option value="{{ $office->id }}" {{ is_array(old('offices')) && in_array($office->id, old('offices')) ? 'selected' : '' }}>{{ $office->name }}</option>
                                     @endforeach
@@ -282,11 +279,12 @@
             url: "{{ route('api.office.index') }}",
             data: {group: group},
             success: function(result){
-                var html = '<option value="" selected>--Pilih--</option>';
+                var html = '<option value="" disabled>--Pilih--</option>';
                 $(result).each(function(key,value){
                     html += '<option value="' + value.id + '">' + value.name + '</option>';
                 });
                 $("#office").html(html).removeAttr("disabled");
+                $("#offices").html(html).removeAttr("disabled");
             }
         });
         $.ajax({
@@ -294,7 +292,7 @@
             url: "{{ route('api.position.index') }}",
             data: {group: group},
             success: function(result){
-                var html = '<option value="" selected>--Pilih--</option>';
+                var html = '<option value="" disabled>--Pilih--</option>';
                 $(result).each(function(key,value){
                     html += '<option value="' + value.id + '">' + value.name + '</option>';
                 });

@@ -35,7 +35,7 @@
                         <div class="col-lg-10 col-md-9">
                             <select name="offices[]" class="form-select form-select-sm {{ $errors->has('offices') ? 'border-danger' : '' }}" id="offices" multiple="multiple">
                                 <option value="" disabled>--Pilih--</option>
-                                @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                @foreach(\App\Models\Group::find($user->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                 <option value="{{ $office->id }}" {{ in_array($office->id, $user->managed_offices()->pluck('office_id')->toArray()) ? 'selected' : '' }}>{{ $office->name }}</option>
                                 @endforeach
                             </select>
