@@ -24,6 +24,9 @@ class SummaryAttendanceController extends Controller
      */
     public function index(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Set params
         $dt1 = date('m') > 1 ? date('Y-m-d', strtotime(date('Y').'-'.(date('m')-1).'-24')) : date('Y-m-d', strtotime((date('Y')-1).'-12-24'));
         $dt2 = date('Y-m-d', strtotime(date('Y').'-'.date('m').'-23'));
@@ -43,7 +46,7 @@ class SummaryAttendanceController extends Controller
             else
                 $users = User::where('role_id','=',role('member'))->get();
         }
-        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
+        elseif(Auth::user()->role_id == role('admin')) {
             // Set params
             $group = Auth::user()->group_id;
             $office = $request->query('office') != null ? $request->query('office') : 0;
@@ -53,6 +56,20 @@ class SummaryAttendanceController extends Controller
                 $users = User::where('role_id','=',role('member'))->where('group_id','=',$group)->where('office_id','=',$office)->get();
             else
                 $users = User::where('role_id','=',role('member'))->where('group_id','=',$group)->get();
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            // Set params
+            $user = User::findOrFail(Auth::user()->id);
+            $group = Auth::user()->group_id;
+            $office = $request->query('office') != null ? $request->query('office') : 0;
+
+            // Get users
+            if($office == 0)
+                $users = User::where('role_id','=',role('member'))->where('group_id','=',$group)->whereIn('office_id',$user->managed_offices()->pluck('office_id')->toArray())->get();
+            elseif(in_array($office, $user->managed_offices()->pluck('office_id')->toArray()))
+                $users = User::where('role_id','=',role('member'))->where('group_id','=',$group)->whereIn('office_id',$user->managed_offices()->pluck('office_id')->toArray())->where('office_id','=',$office)->get();
+            else
+                abort(403);
         }
 
         // Set users attendances and absents
@@ -109,6 +126,20 @@ class SummaryAttendanceController extends Controller
      */
     public function detail(Request $request, $id = null)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
+        // Get the user
+        if(Auth::user()->role_id == role('super-admin')) {
+            $user = User::findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('admin')) {
+            $user = User::where('group_id','=',Auth::user()->group_id)->findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            $user = User::where('group_id','=',Auth::user()->group_id)->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->findOrFail($id);
+        }
+
         // Set default date
         $dt1 = date('m') > 1 ? date('Y-m-d', strtotime(date('Y').'-'.(date('m')-1).'-24')) : date('Y-m-d', strtotime((date('Y')-1).'-12-24'));
         $dt2 = date('Y-m-d', strtotime(date('Y').'-'.date('m').'-23'));
@@ -118,9 +149,6 @@ class SummaryAttendanceController extends Controller
         $workhour = $request->query('workhour') != null ? $request->query('workhour') : 0;
         $t1 = $request->query('t1') != null ? DateTimeExt::change($request->query('t1')) : $dt1;
         $t2 = $request->query('t2') != null ? DateTimeExt::change($request->query('t2')) : $dt2;
-
-        // Get the user
-        $user = User::findOrFail($id);
 
         // Get the work hours
         $workhours = WorkHour::where('group_id','=',$user->group_id)->where('office_id','=',$user->office_id)->where('position_id','=',$user->position_id)->orderBy('name','asc')->get();
@@ -180,6 +208,9 @@ class SummaryAttendanceController extends Controller
      */
     public function monitor(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the month and year
         $month = $request->query('month') ?: date('m');
         $year = $request->query('year') ?: date('Y');
@@ -192,8 +223,12 @@ class SummaryAttendanceController extends Controller
             $work_hours = WorkHour::where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->orderBy('name','asc')->get();
             $group = Group::find($request->query('group'));
         }
-        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
+        elseif(Auth::user()->role_id == role('admin')) {
             $work_hours = WorkHour::where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->orderBy('name','asc')->get();
+            $group = Group::find(Auth::user()->group_id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            $work_hours = WorkHour::where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->where('position_id','=',$request->query('position'))->orderBy('name','asc')->get();
             $group = Group::find(Auth::user()->group_id);
         }
 

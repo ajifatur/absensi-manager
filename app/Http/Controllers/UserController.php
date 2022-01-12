@@ -43,6 +43,9 @@ class UserController extends Controller
             return response()->json($users);
         }
 
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Set the status and status sign
         $status = $request->query('status') != null ? $request->query('status') : 1;
         $statusSign = $status == 1 ? '=' : '!=';
@@ -94,13 +97,13 @@ class UserController extends Controller
                 abort(403);
             elseif($request->query('role') == 'member') {
                 if($request->query('office') != null && $request->query('office') != 0 && $request->query('position') != null && $request->query('position') != 0)
-                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
                 elseif(($request->query('office') == null || $request->query('office') == 0) && $request->query('position') != null && $request->query('position') != 0)
-                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('position_id','=',$request->query('position'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('position_id','=',$request->query('position'))->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
                 elseif($request->query('office') != null && $request->query('office') != 0 && ($request->query('position') == null || $request->query('position') == 0))
-                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
                 else
-                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date',$statusSign,null)->orderBy('name','asc')->get();
+                    $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('end_date',$statusSign,null)->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->orderBy('name','asc')->get();
             }
             else
                 return redirect()->route('admin.user.index', ['role' => 'member']);
@@ -124,6 +127,9 @@ class UserController extends Controller
      */
     public function create()
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get roles
         $roles = Role::where('code','!=','super-admin')->orderBy('num_order','asc')->get();
 
@@ -211,8 +217,19 @@ class UserController extends Controller
      */
     public function detail($id)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the user
-        $user = User::findOrFail($id);
+        if(Auth::user()->role_id == role('super-admin')) {
+            $user = User::findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('admin')) {
+            $user = User::where('group_id','=',Auth::user()->group_id)->findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            $user = User::where('group_id','=',Auth::user()->group_id)->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->findOrFail($id);
+        }
 
         // View
         return view('admin/user/detail', [
@@ -228,8 +245,19 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the user
-        $user = User::findOrFail($id);
+        if(Auth::user()->role_id == role('super-admin')) {
+            $user = User::findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('admin')) {
+            $user = User::where('group_id','=',Auth::user()->group_id)->findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            $user = User::where('group_id','=',Auth::user()->group_id)->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->findOrFail($id);
+        }
 
         // Get roles
         $roles = Role::where('code','!=','super-admin')->orderBy('num_order','asc')->get();
@@ -315,7 +343,10 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function delete(Request $request)
-    {        
+    {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the user
         $user = User::find($request->id);
 

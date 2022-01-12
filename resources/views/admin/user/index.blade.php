@@ -6,7 +6,9 @@
 
 <div class="d-sm-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-2 mb-sm-0">Kelola {{ role(role(Request::query('role'))) }}</h1>
+    @if(has_access('UserController::create', Auth::user()->role_id, false))
     <a href="{{ route('admin.user.create', ['role' => Request::query('role')]) }}" class="btn btn-sm btn-primary"><i class="bi-plus me-1"></i> Tambah {{ role(role(Request::query('role'))) }}</a>
+    @endif
 </div>
 <div class="row">
     <div class="col-12">
@@ -31,12 +33,16 @@
                             <option value="0" selected>Semua Kantor</option>
                             @if(Auth::user()->role_id == role('super-admin'))
                                 @if(Request::query('group') != 0)
-                                    @foreach(\App\Models\Group::find(Request::query('group'))->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                    @foreach(\App\Models\Group::find($_GET['group'])->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                     <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                     @endforeach
                                 @endif
-                            @elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
+                            @elseif(Auth::user()->role_id == role('admin'))
                                 @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
+                                @endforeach
+                            @elseif(Auth::user()->role_id == role('manager'))
+                                @foreach(Auth::user()->managed_offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                 <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                 @endforeach
                             @endif
@@ -166,11 +172,15 @@
                                     @endif
                                     <td align="center">
                                         <div class="btn-group">
+                                            @if(has_access('UserController::edit', Auth::user()->role_id, false))
                                             <a href="{{ route('admin.user.edit', ['id' => $user->id]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="bi-pencil"></i></a>
+                                            @endif
                                             @if(Auth::user()->role_id == role('super-admin'))
                                             <a href="#" class="btn btn-sm btn-danger {{ $user->id > 1 ? 'btn-delete' : '' }}" data-id="{{ $user->id }}" style="{{ $user->id > 1 ? '' : 'cursor: not-allowed' }}" data-bs-toggle="tooltip" title="{{ $user->id <= 1 ? $user->id == Auth::user()->id ? 'Tidak dapat menghapus akun sendiri' : 'Akun ini tidak boleh dihapus' : 'Hapus' }}"><i class="bi-trash"></i></a>
                                             @elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
-                                            <a href="#" class="btn btn-sm btn-danger {{ $user->id != Auth::user()->id ? 'btn-delete' : '' }}" data-id="{{ $user->id }}" style="{{ $user->id != Auth::user()->id ? '' : 'cursor: not-allowed' }}" data-bs-toggle="tooltip" title="{{ $user->id == Auth::user()->id ? 'Tidak dapat menghapus akun sendiri' : 'Hapus' }}"><i class="bi-trash"></i></a>
+                                                @if(has_access('UserController::delete', Auth::user()->role_id, false))
+                                                <a href="#" class="btn btn-sm btn-danger {{ $user->id != Auth::user()->id ? 'btn-delete' : '' }}" data-id="{{ $user->id }}" style="{{ $user->id != Auth::user()->id ? '' : 'cursor: not-allowed' }}" data-bs-toggle="tooltip" title="{{ $user->id == Auth::user()->id ? 'Tidak dapat menghapus akun sendiri' : 'Hapus' }}"><i class="bi-trash"></i></a>
+                                                @endif
                                             @endif
                                         </div>
                                     </td>

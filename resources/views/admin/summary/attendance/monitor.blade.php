@@ -41,12 +41,16 @@
                             <option value="0" disabled selected>--Pilih Kantor--</option>
                             @if(Auth::user()->role_id == role('super-admin'))
                                 @if(Request::query('group') != 0)
-                                    @foreach(\App\Models\Group::find(Request::query('group'))->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                    @foreach(\App\Models\Group::find($_GET['group'])->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                     <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                     @endforeach
                                 @endif
-                            @elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager'))
+                            @elseif(Auth::user()->role_id == role('admin'))
                                 @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
+                                @endforeach
+                            @elseif(Auth::user()->role_id == role('manager'))
+                                @foreach(Auth::user()->managed_offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                 <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                 @endforeach
                             @endif

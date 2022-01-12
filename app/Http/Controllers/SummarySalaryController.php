@@ -31,6 +31,9 @@ class SummarySalaryController extends Controller
      */
     public function index(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+        
         // Get users
         if(Auth::user()->role_id == role('super-admin')) {
             $users = User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->orderBy('name','asc')->get();

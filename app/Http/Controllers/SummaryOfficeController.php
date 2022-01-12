@@ -31,6 +31,9 @@ class SummaryOfficeController extends Controller
      */
     public function index(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+        
         // Get offices
         if(Auth::user()->role_id == role('super-admin')) {
             $group = Group::find($request->query('group'));

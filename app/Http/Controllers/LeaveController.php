@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Ajifatur\Helpers\DateTimeExt;
 use App\Models\Leave;
 use App\Models\Group;
+use App\Models\User;
 
 class LeaveController extends Controller
 {
@@ -20,13 +21,25 @@ class LeaveController extends Controller
      */
     public function index(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get leaves
         if(Auth::user()->role_id == role('super-admin'))
             $leaves = Leave::has('user')->orderBy('date','desc')->get();
-        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
+        elseif(Auth::user()->role_id == role('admin')) {
             $group = Auth::user()->group_id;
             $leaves = Leave::has('user')->whereHas('user', function (Builder $query) use ($group) {
                 return $query->where('group_id','=',$group);
+            })->orderBy('date','desc')->get();
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            // Get the user
+            $user = User::findOrFail(Auth::user()->id);
+
+            $group = Auth::user()->group_id;
+            $leaves = Leave::has('user')->whereHas('user', function (Builder $query) use ($user, $group) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$user->managed_offices()->pluck('office_id')->toArray());
             })->orderBy('date','desc')->get();
         }
 
@@ -43,6 +56,9 @@ class LeaveController extends Controller
      */
     public function create()
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
@@ -93,8 +109,37 @@ class LeaveController extends Controller
      */
     public function edit($id)
     {
-        // Get the leave
-        $leave = Leave::findOrFail($id);
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
+        if(Auth::user()->role_id == role('super-admin')) {
+            // Get the leave
+            $leave = Leave::findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('admin')) {
+            // Get the group
+            $group = Auth::user()->group_id;
+
+            // Get offices
+            $offices = Auth::user()->group->offices()->pluck('id')->toArray();
+
+            // Get the leave
+            $leave = Leave::whereHas('user', function (Builder $query) use ($group, $offices) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$offices);
+            })->findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            // Get the group
+            $group = Auth::user()->group_id;
+
+            // Get offices
+            $offices = Auth::user()->managed_offices()->pluck('office_id')->toArray();
+
+            // Get the leave
+            $leave = Leave::whereHas('user', function (Builder $query) use ($group, $offices) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$offices);
+            })->findOrFail($id);
+        }
 
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
@@ -142,7 +187,10 @@ class LeaveController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function delete(Request $request)
-    {        
+    {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the leave
         $leave = Leave::find($request->id);
 

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Ajifatur\Helpers\DateTimeExt;
 use App\Models\Absent;
 use App\Models\Group;
+use App\Models\User;
 
 class AbsentController extends Controller
 {
@@ -20,13 +21,26 @@ class AbsentController extends Controller
      */
     public function index(Request $request)
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get absents
         if(Auth::user()->role_id == role('super-admin'))
             $absents = Absent::has('user')->orderBy('date','desc')->get();
-        elseif(Auth::user()->role_id == role('admin') || Auth::user()->role_id == role('manager')) {
+        elseif(Auth::user()->role_id == role('admin')) {
             $group = Auth::user()->group_id;
             $absents = Absent::has('user')->whereHas('user', function (Builder $query) use ($group) {
                 return $query->where('group_id','=',$group);
+            })->orderBy('date','desc')->get();
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            // Get the user
+            $user = User::findOrFail(Auth::user()->id);
+
+            // Get absents
+            $group = Auth::user()->group_id;
+            $absents = Absent::has('user')->whereHas('user', function (Builder $query) use ($user, $group) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$user->managed_offices()->pluck('office_id')->toArray());
             })->orderBy('date','desc')->get();
         }
 
@@ -43,6 +57,9 @@ class AbsentController extends Controller
      */
     public function create()
     {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
 
@@ -98,8 +115,37 @@ class AbsentController extends Controller
      */
     public function edit($id)
     {
-        // Get the absent
-        $absent = Absent::findOrFail($id);
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+        
+        if(Auth::user()->role_id == role('super-admin')) {
+            // Get the absent
+            $absent = Absent::findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('admin')) {
+            // Get the group
+            $group = Auth::user()->group_id;
+
+            // Get offices
+            $offices = Auth::user()->group->offices()->pluck('id')->toArray();
+
+            // Get the absent
+            $absent = Absent::whereHas('user', function (Builder $query) use ($group, $offices) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$offices);
+            })->findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            // Get the group
+            $group = Auth::user()->group_id;
+
+            // Get offices
+            $offices = Auth::user()->managed_offices()->pluck('office_id')->toArray();
+
+            // Get the absent
+            $absent = Absent::whereHas('user', function (Builder $query) use ($group, $offices) {
+                return $query->where('group_id','=',$group)->whereIn('office_id',$offices);
+            })->findOrFail($id);
+        }
 
         // Get groups
         $groups = Group::orderBy('name','asc')->get();
@@ -151,7 +197,10 @@ class AbsentController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function delete(Request $request)
-    {        
+    {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
         // Get the absent
         $absent = Absent::find($request->id);
 

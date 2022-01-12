@@ -33,27 +33,21 @@
                             @endif
                         </div>
                     </div>
-                    @php
-                        $disabled_selected = '';
-                        if(Auth::user()->role_id == role('super-admin') && old('group_id') == null)
-                            $disabled_selected = 'disabled';
-                    @endphp
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Kantor <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
-                            <select name="office_id" class="form-select form-select-sm {{ $errors->has('office_id') ? 'border-danger' : '' }}" id="office" {{ $disabled_selected }}>
-                                @if(Auth::user()->role_id == role('super-admin'))
-                                    @if(old('office_id') != null || old('group_id') != null)
-                                        <option value="" selected>--Pilih--</option>
-                                        @foreach(\App\Models\Group::find(old('group_id'))->offices as $office)
-                                            <option value="{{ $office->id }}" {{ old('office_id') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
-                                        @endforeach
-                                    @else
-                                        <option value="" selected>--Pilih--</option>
-                                    @endif
-                                @else
-                                    <option value="" selected>--Pilih--</option>
-                                    @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices as $office)
+                            <select name="office_id" class="form-select form-select-sm {{ $errors->has('office_id') ? 'border-danger' : '' }}" id="office" {{ Auth::user()->role_id == role('super-admin') && old('group_id') == null ? 'disabled' : '' }}>
+                                <option value="" disabled selected>--Pilih--</option>
+                                @if(Auth::user()->role_id == role('super-admin') && old('group_id') != null)
+                                    @foreach(\App\Models\Group::find(old('group_id'))->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                        <option value="{{ $office->id }}" {{ old('office_id') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
+                                    @endforeach
+                                @elseif(Auth::user()->role_id == role('admin'))
+                                    @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                    <option value="{{ $office->id }}" {{ old('office_id') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
+                                    @endforeach
+                                @elseif(Auth::user()->role_id == role('manager'))
+                                    @foreach(Auth::user()->managed_offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                     <option value="{{ $office->id }}" {{ old('office_id') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                     @endforeach
                                 @endif
@@ -66,20 +60,11 @@
                     <div class="row mb-3">
                         <label class="col-lg-2 col-md-3 col-form-label">Karyawan <span class="text-danger">*</span></label>
                         <div class="col-lg-10 col-md-9">
-                            <select name="user_id" class="form-select form-select-sm {{ $errors->has('user_id') ? 'border-danger' : '' }}" id="member" disabled>
-                                @if(Auth::user()->role_id == role('super-admin'))
-                                    @if(old('user_id') != null || old('group_id') != null)
-                                        <option value="" selected>--Pilih--</option>
-                                        @foreach(\App\Models\Group::find(old('group_id'))->users()->where('role_id','=',role('member'))->where('end_date','=',null)->orderBy('name','asc')->get() as $user)
-                                            <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                                        @endforeach
-                                    @else
-                                        <option value="" selected>--Pilih--</option>
-                                    @endif
-                                @else
-                                    <option value="" selected>--Pilih--</option>
-                                    @foreach(\App\Models\Group::find(Auth::user()->group_id)->users()->where('role_id','=',role('member'))->where('end_date','=',null)->orderBy('name','asc')->get() as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            <select name="user_id" class="form-select form-select-sm {{ $errors->has('user_id') ? 'border-danger' : '' }}" id="member" {{ old('office_id') != null ? '' : 'disabled' }}>
+                                <option value="" disabled selected>--Pilih--</option>
+                                @if(old('office_id') != null)
+                                    @foreach(\App\Models\Office::find(old('office_id'))->users()->where('role_id','=',role('member'))->where('end_date','=',null)->orderBy('name','asc')->get() as $user)
+                                        <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                                     @endforeach
                                 @endif
                             </select>

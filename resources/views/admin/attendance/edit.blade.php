@@ -33,7 +33,7 @@
                         <div class="col-lg-10 col-md-9">
                             <select name="office_id" class="form-select form-select-sm {{ $errors->has('office_id') ? 'border-danger' : '' }}" id="office" disabled>
                                 <option value="" selected>--Pilih--</option>
-                                @foreach(\App\Models\Group::find($attendance->user->group_id)->offices as $office)
+                                @foreach(\App\Models\Group::find($attendance->user->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
                                     <option value="{{ $office->id }}" {{ $attendance->office_id == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
                                 @endforeach
                             </select>
