@@ -146,10 +146,9 @@
 													<a tabindex="0" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="Keterangan" data-bs-content="
 													@foreach($salary['category']->indicators as $indicator)
 														@if($indicator->upper_range != null)
-															Jika nilai yaitu <strong>{{ $indicator->lower_range }}</strong> - <strong>{{ $indicator->upper_range }}</strong>, maka jumlahnya adalah <strong>Rp {{ number_format($indicator->amount,0,',',',') }}</strong>.
-														<br>
+															<p>Jika nilai diisi <strong>{{ $indicator->lower_range }}</strong> - <strong>{{ $indicator->upper_range }}</strong>, maka {{ $salary['category']->name }} adalah <strong>Rp {{ number_format($indicator->amount,0,',',',') }}</strong>.</p>
 														@else
-															Jika nilai yaitu >= <strong>{{ $indicator->lower_range }}</strong>, maka jumlahnya adalah <strong>Rp {{ number_format($indicator->amount,0,',',',') }}</strong>.
+															<p class='mb-0'>Jika nilai diisi >= <strong>{{ $indicator->lower_range }}</strong>, maka {{ $salary['category']->name }} adalah <strong>Rp {{ number_format($indicator->amount,0,',',',') }}</strong>.</p>
 														@endif
 													@endforeach
 													">Keterangan</a>
