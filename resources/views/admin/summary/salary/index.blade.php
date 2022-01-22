@@ -139,8 +139,10 @@
                                             <span class="amount-indicator" data-user="{{ $user->id }}" data-category="{{ $salary['category']->id }}">{{ number_format($salary['amount'],0,',',',') }}</span>
                                             <hr class="my-1">
                                             @if($salary['category']->type_id == 1)
+												@if($salary['category']->indicators()->count() > 1)
                                                 <p class="text-start text-muted mb-0">Nilai:</p>
                                                 <input type="number" class="form-control form-control-sm user-indicator" data-user="{{ $user->id }}" data-category="{{ $salary['category']->id }}" data-month="{{ $month }}" data-year="{{ $year }}" value="{{ $salary['value'] }}">
+												@endif
                                             @elseif($salary['category']->type_id == 2)
                                                 <p class="text-start text-muted mb-0">Masa Kerja:</p>
                                                 <p class="text-start text-success mb-0">{{ number_format($salary['value'],1,'.',',') }} bulan</p>
