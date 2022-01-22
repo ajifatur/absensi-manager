@@ -142,6 +142,18 @@
 												@if($salary['category']->indicators()->count() > 1)
                                                 <p class="text-start text-muted mb-0">Nilai:</p>
                                                 <input type="number" class="form-control form-control-sm user-indicator" data-user="{{ $user->id }}" data-category="{{ $salary['category']->id }}" data-month="{{ $month }}" data-year="{{ $year }}" value="{{ $salary['value'] }}">
+												<p class="small text-start text-decoration-underline text-info mb-0">
+													<a tabindex="0" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="Keterangan" data-bs-content="
+													@foreach($salary['category']->indicators as $indicator)
+														@if($indicator->upper_range != null)
+															Jika nilai yaitu <strong>{{ $indicator->lower_range }}</strong> - <strong>{{ $indicator->upper_range }}</strong>, maka jumlahnya adalah <strong>Rp {{ number_format($indicator->amount,0,',',',') }}</strong>.
+														<br>
+														@else
+															Jika nilai yaitu >= <strong>{{ $indicator->lower_range }}</strong>, maka jumlahnya adalah <strong>Rp {{ number_format($indicator->amount,0,',',',') }}</strong>.
+														@endif
+													@endforeach
+													">Keterangan</a>
+												</p>
 												@endif
                                             @elseif($salary['category']->type_id == 2)
                                                 <p class="text-start text-muted mb-0">Masa Kerja:</p>
@@ -198,6 +210,12 @@
     // Checkbox
     Spandiv.CheckboxOne();
     Spandiv.CheckboxAll();
+	
+	// Popover
+	var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+	var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
+	  return new bootstrap.Popover(popoverTriggerEl, {html: true});
+	});
 
     // Change Group
     $(document).on("change", "select[name=group]", function() {
