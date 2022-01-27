@@ -10,6 +10,8 @@ use App\Models\Office;
 
 class GroupController extends Controller
 {
+    public $tabs = ['office', 'position', 'admin', 'manager', 'employee', 'non-employee'];
+
     /**
      * Display a listing of the resource.
      *
@@ -98,19 +100,23 @@ class GroupController extends Controller
     /**
      * Display the specified resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function detail($id)
+    public function detail(Request $request, $id)
     {
-        abort(403);
+        // Redirect
+        if(!in_array($request->query('tab'), $this->tabs)) {
+            return redirect()->route('admin.group.detail', ['id' => $id, 'tab' => $this->tabs[0]]);
+        }
 
         // Get the group
         $group = Group::findOrFail($id);
 
         // View
         return view('admin/group/detail', [
-            'group' => $group,
+            'group' => $group
         ]);
     }
 
