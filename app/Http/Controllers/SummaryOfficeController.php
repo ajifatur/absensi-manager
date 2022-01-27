@@ -124,6 +124,18 @@ class SummaryOfficeController extends Controller
                 }
                 $subtotal += $amount;
             }
+            // By certification
+            elseif($category->type_id == 3) {
+                $value = $user->certifications()->where('certification_id','=',$category->certification_id)->where('date','<=',$year.'-'.$month.'-'.$user->group->period_end)->count();
+                $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
+                if($category->multiplied_by_attendances != 0) {
+                    if(is_int($attendances))
+                        $amount = $amount * $attendances;
+                    elseif(is_array($attendances))
+                        $amount = $amount * $attendances[$category->multiplied_by_attendances]['count'];
+                }
+                $subtotal += $amount;
+            }
         }
         $total = $subtotal;
 

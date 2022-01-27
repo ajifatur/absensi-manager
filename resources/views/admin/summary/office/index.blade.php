@@ -29,7 +29,7 @@
                     @if(Auth::user()->role_id == role('super-admin'))
                     <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
                         <select name="group" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Perusahaan">
-                            <option value="0">--Pilih Perusahaan--</option>
+                            <option value="0">Semua Perusahaan</option>
                             @foreach($groups as $group)
                             <option value="{{ $group->id }}" {{ Request::query('group') == $group->id ? 'selected' : '' }}>{{ $group->name }}</option>
                             @endforeach
@@ -54,7 +54,10 @@
                         <thead class="bg-light">
                             <tr>
                                 <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
-                                <th>Nama</th>
+                                <th>Kantor</th>
+                                @if(Auth::user()->role_id == role('super-admin'))
+                                <th width="150">Perusahaan</th>
+                                @endif
                                 <th width="80">Total Gaji Kotor</th>
                                 <th width="80">Total Keterlambatan</th>
                                 <th width="80">Total Kasbon</th>
@@ -67,6 +70,13 @@
                             <tr>
                                 <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
                                 <td><a href="{{ route('admin.office.detail', ['id' => $office->id]) }}">{{ $office->name }}</a></td>
+                                @if(Auth::user()->role_id == role('super-admin'))
+                                <td>
+                                    @if($office->group)
+                                        <a href="{{ route('admin.group.detail', ['id' => $office->group->id]) }}">{{ $office->group->name }}</a>
+                                    @endif
+                                </td>
+                                @endif
                                 <td align="right">{{ number_format($office->grossSalary,0,',',',') }}</td>
                                 <td align="right">{{ number_format($office->late_fund,0,',',',') }}</td>
                                 <td align="right">{{ number_format($office->debt_fund,0,',',',') }}</td>

@@ -81,6 +81,7 @@
                                         @foreach($certifications as $certification)
                                         <td>
                                             <?php $uc = $user->certifications()->where('certification_id','=',$certification->id)->first(); ?>
+											<span class="d-none">{{ $uc && $uc->date != null ? $uc->date : '' }}</span>
                                             <input type="text" class="form-control form-control-sm date" data-user="{{ $user->id }}" data-certification="{{ $certification->id }}" value="{{ $uc && $uc->date != null ? date('d/m/Y', strtotime($uc->date)) : null }}" autocomplete="off">
                                         </td>
                                         @endforeach
