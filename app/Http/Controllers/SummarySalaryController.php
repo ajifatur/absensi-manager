@@ -106,6 +106,23 @@ class SummarySalaryController extends Controller
                         ]);
                         $subtotalSalary += $amount;
                     }
+                    // By certification
+                    elseif($category->type_id == 3) {
+                        $value = $user->certifications()->where('certification_id','=',$category->certification_id)->whereYear('date','<=',$year)->whereMonth('date','<=',$month)->count();
+                        $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
+                        if($category->multiplied_by_attendances != 0) {
+                            if(is_int($users[$key]->attendances))
+                                $amount = $amount * $users[$key]->attendances;
+                            elseif(is_array($users[$key]->attendances))
+                                $amount = $amount * $users[$key]->attendances[$category->multiplied_by_attendances]['count'];
+                        }
+                        array_push($salary, [
+                            'category' => $category,
+                            'value' => $value,
+                            'amount' => $amount
+                        ]);
+                        $subtotalSalary += $amount;
+                    }
                 }
                 $users[$key]->salary = $salary;
 
@@ -207,7 +224,7 @@ class SummarySalaryController extends Controller
         // Get the user
         $user = User::find($request->user);
 
-        // Update / create the user /* t */ fund
+        // Update / create the user debt fund
         $user_debt_fund = UserDebtFund::where('user_id','=',$user->id)->where('year','<=',$request->year)->where('month','<=',$request->month)->latest()->first();
         if(!$user_debt_fund) $user_debt_fund = new UserDebtFund;
         $user_debt_fund->user_id = $user->id;
@@ -259,6 +276,18 @@ class SummarySalaryController extends Controller
             // By period per month
             elseif($category->type_id == 2) {
                 $amount = Salary::getAmountByRange(period($user->id), $user->group_id, $category->id);
+                if($category->multiplied_by_attendances != 0) {
+                    if(is_int($attendances))
+                        $amount = $amount * $attendances;
+                    elseif(is_array($attendances))
+                        $amount = $amount * $attendances[$category->multiplied_by_attendances]['count'];
+                }
+                $subtotal += $amount;
+            }
+            // By certification
+            elseif($category->type_id == 3) {
+                $value = $user->certifications()->where('certification_id','=',$category->certification_id)->whereYear('date','<=',$year)->whereMonth('date','<=',$month)->count();
+                $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
                 if($category->multiplied_by_attendances != 0) {
                     if(is_int($attendances))
                         $amount = $amount * $attendances;

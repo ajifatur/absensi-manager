@@ -157,6 +157,9 @@
                                             @elseif($salary['category']->type_id == 2)
                                                 <p class="text-start text-muted mb-0">Masa Kerja:</p>
                                                 <p class="text-start text-success mb-0">{{ number_format($salary['value'],1,'.',',') }} bulan</p>
+                                            @elseif($salary['category']->type_id == 3)
+                                                <p class="text-start text-muted mb-0">Sertifikasi:</p>
+                                                <p class="text-start text-success mb-0">{{ number_format($salary['value'],0,'.',',') }}x</p>
                                             @endif
                                         </td>
                                         @endforeach

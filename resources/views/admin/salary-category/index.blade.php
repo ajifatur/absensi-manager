@@ -61,6 +61,11 @@
                                 <td>
                                     @if($category->type_id == 1) Manual
                                     @elseif($category->type_id == 2) Masa Kerja (Bulan)
+                                    @elseif($category->type_id == 3) Sertifikasi
+                                    @endif
+                                    @if($category->type_id == 3 && $category->certification)
+                                        <br>
+                                        <span class="small text-muted">{{ $category->certification->name }}</span>
                                     @endif
                                 </td>
                                 <td>{{ number_format($category->indicators()->count(),0,',',',') }}</td>

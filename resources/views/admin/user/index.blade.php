@@ -108,7 +108,7 @@
                                 @if(Auth::user()->role_id == role('super-admin') && Request::query('group') == null)
                                     <th width="150">Perusahaan</th>
                                 @endif
-                                <th width="40">Opsi</th>
+                                <th width="60">Opsi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -172,6 +172,7 @@
                                     @endif
                                     <td align="center">
                                         <div class="btn-group">
+                                            <a href="{{ route('admin.user.edit-certification', ['id' => $user->id]) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Edit Sertifikasi"><i class="bi-star"></i></a>
                                             @if(has_access('UserController::edit', Auth::user()->role_id, false))
                                             <a href="{{ route('admin.user.edit', ['id' => $user->id]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="bi-pencil"></i></a>
                                             @endif

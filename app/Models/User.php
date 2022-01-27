@@ -88,6 +88,14 @@ class User extends \Ajifatur\FaturHelper\Models\User
     }
 
     /**
+     * Get the certifications for the user.
+     */
+    public function certifications()
+    {
+        return $this->hasMany(\App\Models\UserCertification::class);
+    }
+
+    /**
      * The offices that belong to the manager.
      */
     public function managed_offices()

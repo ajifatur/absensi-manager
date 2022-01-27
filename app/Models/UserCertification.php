@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserDebtFund extends Model
+class UserCertification extends Model
 {
     use HasFactory;
 
@@ -14,20 +14,12 @@ class UserDebtFund extends Model
      *
      * @var string
      */
-    protected $table = 'user__debt__funds';
+    protected $table = 'user_certifications';
 
     /**
      * Fill the model with an array of attributes.
      *
      * @param  array
      */
-    protected $fillable = ['month', 'year', 'amount'];
-    
-    /**
-     * Get the user that owns the debt fund.
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+    protected $fillable = ['date'];
 }

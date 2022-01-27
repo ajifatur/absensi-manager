@@ -57,9 +57,24 @@
                                 <option value="" selected>--Pilih--</option>
                                 <option value="1" {{ $salary_category->type_id == 1 ? 'selected' : '' }}>Manual</option>
                                 <option value="2" {{ $salary_category->type_id == 2 ? 'selected' : '' }}>Masa Kerja (Bulan)</option>
+                                <option value="3" {{ $salary_category->type_id == 3 ? 'selected' : '' }}>Sertifikasi</option>
                             </select>
                             @if($errors->has('type_id'))
                             <div class="small text-danger">{{ $errors->first('type_id') }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="row mb-3 {{ $salary_category->type_id == 3 || $errors->has('certification_id') ? '' : 'd-none' }}">
+                        <label class="col-lg-2 col-md-3 col-form-label">Sertifikasi <span class="text-danger">*</span></label>
+                        <div class="col-lg-10 col-md-9">
+                            <select name="certification_id" class="form-select form-select-sm {{ $errors->has('certification_id') ? 'border-danger' : '' }}" id="certification">
+                                <option value="" disabled selected>--Pilih--</option>
+                                @foreach($certifications as $certification)
+                                <option value="{{ $certification->id }}">{{ $certification->name }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('certification_id'))
+                            <div class="small text-danger">{{ $errors->first('certification_id') }}</div>
                             @endif
                         </div>
                     </div>
@@ -91,5 +106,33 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('js')
+
+<script type="text/javascript">
+    // Change Position and Type
+    $(document).on("change", "select[name=type_id], select[name=position_id]", function() {
+        var type = $("select[name=type_id]").val();
+        var position = $("select[name=position_id]").val();
+        if(type == 3) {
+            $.ajax({
+                type: 'get',
+                url: "{{ route('api.certification.index') }}",
+                data: {position: position},
+                success: function(result){
+                    var html = '<option value="" disabled selected>--Pilih--</option>';
+                    $(result).each(function(key,value){
+                        html += '<option value="' + value.id + '">' + value.name + '</option>';
+                    });
+                    $("#certification").html(html).removeAttr("disabled");
+                }
+            });
+            $("#certification").parents(".row.mb-3").removeClass("d-none");
+        }
+        else $("#certification").parents(".row.mb-3").addClass("d-none");
+    });
+</script>
 
 @endsection

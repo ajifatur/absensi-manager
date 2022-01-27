@@ -62,6 +62,8 @@ Route::group(['middleware' => ['admin']], function() {
 	Route::get('/admin/user/edit/{id}', 'UserController@edit')->name('admin.user.edit');
 	Route::post('/admin/user/update', 'UserController@update')->name('admin.user.update');
 	Route::post('/admin/user/delete', 'UserController@delete')->name('admin.user.delete');
+	Route::get('/admin/user/edit-certification/{id}', 'UserController@editCertification')->name('admin.user.edit-certification');
+	Route::post('/admin/user/update-certification', 'UserController@updateCertification')->name('admin.user.update-certification');
 
 	// Group
 	Route::get('/admin/group', 'GroupController@index')->name('admin.group.index');
@@ -97,6 +99,14 @@ Route::group(['middleware' => ['admin']], function() {
 	Route::get('/admin/work-hour/edit/{id}', 'WorkHourController@edit')->name('admin.work-hour.edit');
 	Route::post('/admin/work-hour/update', 'WorkHourController@update')->name('admin.work-hour.update');
 	Route::post('/admin/work-hour/delete', 'WorkHourController@delete')->name('admin.work-hour.delete');
+
+	// Certification
+	Route::get('/admin/certification', 'CertificationController@index')->name('admin.certification.index');
+	Route::get('/admin/certification/create', 'CertificationController@create')->name('admin.certification.create');
+	Route::post('/admin/certification/store', 'CertificationController@store')->name('admin.certification.store');
+	Route::get('/admin/certification/edit/{id}', 'CertificationController@edit')->name('admin.certification.edit');
+	Route::post('/admin/certification/update', 'CertificationController@update')->name('admin.certification.update');
+	Route::post('/admin/certification/delete', 'CertificationController@delete')->name('admin.certification.delete');
 
 	// Salary Category
 	Route::get('/admin/salary-category', 'SalaryCategoryController@index')->name('admin.salary-category.index');

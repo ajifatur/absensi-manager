@@ -22,6 +22,11 @@
                         <br>
                         @if($salary_category->type_id == 1) Manual
                         @elseif($salary_category->type_id == 2) Masa Kerja (Bulan)
+                        @elseif($salary_category->type_id == 3) Sertifikasi
+                        @endif
+                        @if($salary_category->type_id == 3 && $salary_category->certification)
+                            <br>
+                            <span class="small text-muted">{{ $salary_category->certification->name }}</span>
                         @endif
                     </li>
                     <li class="list-group-item px-0">

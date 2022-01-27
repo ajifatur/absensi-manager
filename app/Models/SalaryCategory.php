@@ -21,7 +21,7 @@ class SalaryCategory extends Model
      *
      * @param  array
      */
-    protected $fillable = ['name', 'type'];
+    protected $fillable = ['name', 'type_id'];
     
     /**
      * Get the group that owns the salary category.
@@ -37,6 +37,14 @@ class SalaryCategory extends Model
     public function position()
     {
         return $this->belongsTo(Position::class, 'position_id');
+    }
+    
+    /**
+     * Get the certification that owns the salary category.
+     */
+    public function certification()
+    {
+        return $this->belongsTo(Certification::class, 'certification_id');
     }
 
     /**

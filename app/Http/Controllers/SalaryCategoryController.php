@@ -9,6 +9,7 @@ use App\Models\SalaryCategory;
 use App\Models\SalaryIndicator;
 use App\Models\Group;
 use App\Models\WorkHourCategory;
+use App\Models\Certification;
 
 class SalaryCategoryController extends Controller
 {
@@ -86,6 +87,7 @@ class SalaryCategoryController extends Controller
             'position_id' => 'required',
             'name' => 'required|max:255',
             'type_id' => 'required',
+            'certification_id' => $request->type_id == 3 ? 'required' : '',
             'multiplied_by_attendances' => 'required',
         ]);
         
@@ -99,6 +101,7 @@ class SalaryCategoryController extends Controller
             $salary_category = new SalaryCategory;
             $salary_category->group_id = Auth::user()->role_id == role('super-admin') ? $request->group_id : Auth::user()->group_id;
             $salary_category->position_id = $request->position_id;
+            $salary_category->certification_id = $request->type_id == 3 ? $request->certification_id : 0;
             $salary_category->name = $request->name;
             $salary_category->type_id = $request->type_id;
             $salary_category->multiplied_by_attendances = $request->multiplied_by_attendances;
@@ -129,11 +132,15 @@ class SalaryCategoryController extends Controller
         // Get categories
         $categories = WorkHourCategory::orderBy('name','asc')->get();
 
+        // Get certifications
+        $certifications = Certification::where('position_id','=',$salary_category->position_id)->orderBy('name','asc')->get();
+
         // View
         return view('admin/salary-category/edit', [
             'salary_category' => $salary_category,
             'groups' => $groups,
             'categories' => $categories,
+            'certifications' => $certifications,
         ]);
     }
 
@@ -150,6 +157,7 @@ class SalaryCategoryController extends Controller
             'position_id' => 'required',
             'name' => 'required|max:255',
             'type_id' => 'required',
+            'certification_id' => $request->type_id == 3 ? 'required' : '',
             'multiplied_by_attendances' => 'required',
         ]);
         
@@ -162,6 +170,7 @@ class SalaryCategoryController extends Controller
             // Update the salary category
             $salary_category = SalaryCategory::find($request->id);
             $salary_category->position_id = $request->position_id;
+            $salary_category->certification_id = $request->type_id == 3 ? $request->certification_id : 0;
             $salary_category->name = $request->name;
             $salary_category->type_id = $request->type_id;
             $salary_category->multiplied_by_attendances = $request->multiplied_by_attendances;

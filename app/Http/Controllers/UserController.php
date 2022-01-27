@@ -18,6 +18,8 @@ use App\Models\SalaryCategory;
 use App\Models\UserIndicator;
 use App\Models\Attendance;
 use App\Models\WorkHourCategory;
+use App\Models\Certification;
+use App\Models\UserCertification;
 
 class UserController extends Controller
 {
@@ -358,5 +360,68 @@ class UserController extends Controller
 
         // Redirect
         return redirect()->route('admin.user.index', ['role' => $role->code])->with(['message' => 'Berhasil menghapus data.']);
+    }
+
+    /**
+     * Edit the user certifications.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function editCertification($id)
+    {
+        // Check the access
+        has_access(method(__METHOD__), Auth::user()->role_id);
+
+        // Get the user
+        if(Auth::user()->role_id == role('super-admin')) {
+            $user = User::findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('admin')) {
+            $user = User::where('group_id','=',Auth::user()->group_id)->findOrFail($id);
+        }
+        elseif(Auth::user()->role_id == role('manager')) {
+            $user = User::where('group_id','=',Auth::user()->group_id)->whereIn('office_id',Auth::user()->managed_offices()->pluck('office_id')->toArray())->findOrFail($id);
+        }
+
+        // Get the certifications
+        $certifications = Certification::where('position_id','=',$user->position_id)->orderBy('name','asc')->get();
+
+        // View
+        return view('admin/user/edit-certification', [
+            'user' => $user,
+            'certifications' => $certifications
+        ]);
+    }
+
+    /**
+     * Update the user certifications.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateCertification(Request $request)
+    {
+        // Get the user
+        $user = User::find($request->id);
+
+        // Save or update certifications
+        foreach($request->dates as $key=>$date) {
+            $uc = UserCertification::find($request->ids[$key]);
+            if($date != null) {
+                if(!$uc) $uc = new UserCertification;
+
+                $uc->user_id = $user->id;
+                $uc->certification_id = $request->certifications[$key];
+                $uc->date = DateTimeExt::change($date);
+                $uc->save();
+            }
+            else {
+                if($uc) $uc->delete();
+            }
+        }
+
+        // Redirect
+        return redirect()->route('admin.user.edit-certification', ['id' => $user->id])->with(['message' => 'Berhasil mengupdate data.']);
     }
 }
