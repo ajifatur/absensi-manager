@@ -56,20 +56,19 @@
                     <table class="table table-sm table-hover table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
-                                <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
+                                <th width="20"></th>
                                 <th>Karyawan</th>
                                 <th width="150">Kantor</th>
                                 @foreach($certifications as $certification)
                                 <th width="80">{{ $certification->name }}</th>
                                 @endforeach
-                                <th width="20">Opsi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if(count($certifications) > 0)
-                                @foreach($users as $user)
+                                @foreach($users as $key=>$user)
                                     <tr>
-                                        <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
+                                        <td align="center">{{ ($key+1) }}</td>
                                         <td>
                                             <a href="{{ route('admin.user.detail', ['id' => $user->id]) }}">{{ $user->name }}</a>
                                         </td>
@@ -85,7 +84,6 @@
                                             <input type="text" class="form-control form-control-sm date" data-user="{{ $user->id }}" data-certification="{{ $certification->id }}" value="{{ $uc && $uc->date != null ? date('d/m/Y', strtotime($uc->date)) : null }}" autocomplete="off">
                                         </td>
                                         @endforeach
-                                        <td align="center">-</td>
                                     </tr>
                                 @endforeach
                             @endif
@@ -114,11 +112,10 @@
 
 <script type="text/javascript">
     // DataTable
-    Spandiv.DataTableRowsGroup("#datatable");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
+    Spandiv.DataTable("#datatable", {
+        pageLength: -1,
+        orderAll: true
+    });
 
     // Datepicker
     Spandiv.DatePicker("input.date");

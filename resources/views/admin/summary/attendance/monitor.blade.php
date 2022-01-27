@@ -90,12 +90,11 @@
                     <table class="table table-sm table-hover table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
-                                <th rowspan="2" width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
+                                <th rowspan="2" width="20"></th>
                                 <th rowspan="2" width="80">Tanggal</th>
                                 @if(count($work_hours) > 0)
                                 <th colspan="{{ count($work_hours) }}">Jam Kerja</th>
                                 @endif
-                                <th rowspan="2" width="40">Opsi</th>
                             </tr>
                             @if(Request::query('office') != null && Request::query('position') != null && count($work_hours) > 0)
                                 <tr>
@@ -106,9 +105,9 @@
                             @endif
                         </thead>
                         <tbody>
-                            @foreach($dates as $date)
+                            @foreach($dates as $key=>$date)
                                 <tr>
-                                    <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
+                                    <td align="center">{{ ($key+1) }}</td>
                                     <td>
                                         <span class="d-none">{{ \Ajifatur\Helpers\DateTimeExt::change($date) }}</span>
                                         {{ $date }}
@@ -132,11 +131,6 @@
                                             </td>
                                         @endforeach
                                     @endif
-                                    <td align="center">
-                                        <div class="btn-group">
-                                            -
-                                        </div>
-                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -160,11 +154,10 @@
 
 <script type="text/javascript">
     // DataTable
-    Spandiv.DataTableRowsGroup("#datatable");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
+    Spandiv.DataTable("#datatable", {
+        pageLength: -1,
+        orderAll: true
+    });
 
     // Change Group
     $(document).on("change", "select[name=group]", function() {

@@ -210,10 +210,6 @@
     
     // Button Delete
     Spandiv.ButtonDelete(".btn-delete", ".form-delete");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
 
     // Change Group
     $(document).on("change", "select[name=group]", function() {

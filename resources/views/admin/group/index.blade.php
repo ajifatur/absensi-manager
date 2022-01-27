@@ -75,12 +75,9 @@
 <script type="text/javascript">
     // DataTable
     Spandiv.DataTable("#datatable");
+    
     // Button Delete
     Spandiv.ButtonDelete(".btn-delete", ".form-delete");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
 </script>
 
 @endsection

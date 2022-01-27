@@ -236,10 +236,6 @@
     Spandiv.ButtonDelete(".btn-delete", ".form-delete");
     Spandiv.ButtonDelete(".btn-delete-absent", ".form-delete-absent");
     Spandiv.ButtonDelete(".btn-delete-leave", ".form-delete-leave");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
 
     // Change Group
     $(document).on("change", "select[name=group]", function() {

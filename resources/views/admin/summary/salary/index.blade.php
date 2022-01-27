@@ -209,16 +209,9 @@
 <script type="text/javascript">
     // DataTable
     Spandiv.DataTable("#datatable");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
 	
 	// Popover
-	var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-	var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
-	  return new bootstrap.Popover(popoverTriggerEl, {html: true});
-	});
+    Spandiv.Popover();
 
     // Change Group
     $(document).on("change", "select[name=group]", function() {
@@ -296,7 +289,7 @@
                 $(".total-salary[data-user=" + user + "]").text(response.total);
             }
         });
-        $(this).val(rupiah(value));
+        $(this).val(Spandiv.NumberFormat(value));
     });
 
     // Change the User Debt Fund
@@ -313,24 +306,8 @@
                 $(".total-salary[data-user=" + user + "]").text(response.total);
             }
         });
-        $(this).val(rupiah(value));
+        $(this).val(Spandiv.NumberFormat(value));
     });
-
-    // Rupiah
-    function rupiah(value) {
-        var number_string = value.replace(/[^.\d]/g, '').toString();
-        var split = number_string.split('.');
-        var mod = split[0].length % 3;
-        var rupiah = split[0].substr(0, mod);
-        var thousand = split[0].substr(mod).match(/\d{3}/gi);
-
-        if(thousand) {
-            separator = mod ? ',' : '';
-            rupiah += separator + thousand.join(',');
-        }
-
-        return rupiah = split[1] != undefined ? rupiah + '.' + split[1] : rupiah;
-    }
 </script>
 
 @endsection

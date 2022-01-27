@@ -98,14 +98,13 @@
 
 <script type="text/javascript">
     // DataTable
-    Spandiv.DataTableRowsGroup("#datatable", [1]);
+    Spandiv.DataTable("#datatable", {
+        pageLength: -1,
+        rowsGroup: [1]
+    });
 
     // Button Delete
     Spandiv.ButtonDelete(".btn-delete", ".form-delete");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
 
     // Change the Group
     $(document).on("change", ".card-header select[name=group]", function() {

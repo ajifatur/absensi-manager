@@ -138,14 +138,13 @@
 
 <script type="text/javascript">
     // DataTable
-    Spandiv.DataTableRowsGroup("#datatable", [0, 1, 2, 6, 7, 8]);
+    Spandiv.DataTable("#datatable", {
+        pageLength: -1,
+        rowsGroup: [0, 1, 2, 6, 7, 8]
+    });
 
     // Datepicker
     Spandiv.DatePicker("input[name=t1], input[name=t2]");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
 
     // Change Group
     $(document).on("change", "select[name=group]", function() {

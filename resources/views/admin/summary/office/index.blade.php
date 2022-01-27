@@ -99,26 +99,6 @@
 <script type="text/javascript">
     // DataTable
     Spandiv.DataTable("#datatable");
-    
-    // Checkbox
-    Spandiv.CheckboxOne();
-    Spandiv.CheckboxAll();
-
-    // Rupiah
-    function rupiah(value) {
-        var number_string = value.replace(/[^.\d]/g, '').toString();
-        var split = number_string.split('.');
-        var mod = split[0].length % 3;
-        var rupiah = split[0].substr(0, mod);
-        var thousand = split[0].substr(mod).match(/\d{3}/gi);
-
-        if(thousand) {
-            separator = mod ? ',' : '';
-            rupiah += separator + thousand.join(',');
-        }
-
-        return rupiah = split[1] != undefined ? rupiah + '.' + split[1] : rupiah;
-    }
 </script>
 
 @endsection
