@@ -108,7 +108,7 @@ class SummarySalaryController extends Controller
                     }
                     // By certification
                     elseif($category->type_id == 3) {
-                        $value = $user->certifications()->where('certification_id','=',$category->certification_id)->whereYear('date','<=',$year)->whereMonth('date','<=',$month)->count();
+                        $value = $user->certifications()->where('certification_id','=',$category->certification_id)->where('date','<=',$year.'-'.$month.'-'.$user->group->period_end)->count();
                         $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
                         if($category->multiplied_by_attendances != 0) {
                             if(is_int($users[$key]->attendances))
@@ -286,7 +286,7 @@ class SummarySalaryController extends Controller
             }
             // By certification
             elseif($category->type_id == 3) {
-                $value = $user->certifications()->where('certification_id','=',$category->certification_id)->whereYear('date','<=',$year)->whereMonth('date','<=',$month)->count();
+                $value = $user->certifications()->where('certification_id','=',$category->certification_id)->where('date','<=',$year.'-'.$month.'-'.$user->group->period_end)->count();
                 $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
                 if($category->multiplied_by_attendances != 0) {
                     if(is_int($attendances))

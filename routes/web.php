@@ -30,6 +30,10 @@ Route::group(['middleware' => ['admin']], function() {
 	// Summary Office
 	Route::get('/admin/summary/office', 'SummaryOfficeController@index')->name('admin.summary.office.index');
 
+	// Summary Certification
+	Route::get('/admin/summary/certification', 'SummaryCertificationController@index')->name('admin.summary.certification.index');
+	Route::post('/admin/summary/certification/update', 'SummaryCertificationController@update')->name('admin.summary.certification.update');
+
     // Attendance
 	Route::get('/admin/attendance', 'AttendanceController@index')->name('admin.attendance.index');
 	Route::get('/admin/attendance/create', 'AttendanceController@create')->name('admin.attendance.create');

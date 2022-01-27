@@ -5,7 +5,8 @@
 @section('content')
 
 <div class="d-sm-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Rekapitulasi Absensi</h1>
+    <h1 class="h3 mb-2 mb-sm-0">Rekapitulasi Absensi</h1>
+    <a href="{{ route('admin.summary.attendance.monitor') }}" class="btn btn-sm btn-primary"><i class="bi-eye me-1"></i> Monitoring</a>
 </div>
 <div class="row">
     <div class="col-12">
