@@ -70,7 +70,7 @@
                             <select name="certification_id" class="form-select form-select-sm {{ $errors->has('certification_id') ? 'border-danger' : '' }}" id="certification">
                                 <option value="" disabled selected>--Pilih--</option>
                                 @foreach($certifications as $certification)
-                                <option value="{{ $certification->id }}">{{ $certification->name }}</option>
+                                <option value="{{ $certification->id }}" {{ $salary_category->certification_id == $certification->id ? 'selected' : '' }}>{{ $certification->name }}</option>
                                 @endforeach
                             </select>
                             @if($errors->has('certification_id'))

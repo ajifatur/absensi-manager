@@ -26,14 +26,13 @@
                                 <th rowspan="2">Nama</th>
                                 <th rowspan="2" width="70">Kantor</th>
                                 <th rowspan="2" width="70">Jabatan</th>
-                                <th colspan="4">User</th>
+                                <th colspan="3">Pengguna</th>
                                 <th rowspan="2" width="60">Opsi</th>
                             </tr>
                             <tr>
                                 <th width="70">Admin</th>
                                 <th width="70">Manager</th>
                                 <th width="70">Karyawan Aktif</th>
-                                <th width="70">Karyawan Nonaktif</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,7 +45,6 @@
                                 <td align="right">{{ number_format($group->users()->where('role_id','=',role('admin'))->count(),0,',',',') }}</td>
                                 <td align="right">{{ number_format($group->users()->where('role_id','=',role('manager'))->count(),0,',',',') }}</td>
                                 <td align="right">{{ number_format($group->users()->where('role_id','=',role('member'))->where('end_date','=',null)->count(),0,',',',') }}</td>
-                                <td align="right">{{ number_format($group->users()->where('role_id','=',role('member'))->where('end_date','!=',null)->count(),0,',',',') }}</td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('admin.group.edit', ['id' => $group->id]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="bi-pencil"></i></a>

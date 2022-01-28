@@ -53,7 +53,7 @@
                     <table class="table table-sm table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
-                                <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
+                                <th width="20"></th>
                                 <th>Kantor</th>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <th width="150">Perusahaan</th>
@@ -62,13 +62,12 @@
                                 <th width="80">Total Keterlambatan</th>
                                 <th width="80">Total Kasbon</th>
                                 <th width="80">Total Gaji Bersih</th>
-                                <th width="20">Opsi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($offices as $office)
+                            @foreach($offices as $key=>$office)
                             <tr>
-                                <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
+                                <td align="center">{{ ($key+1) }}</td>
                                 <td><a href="{{ route('admin.office.detail', ['id' => $office->id]) }}">{{ $office->name }}</a></td>
                                 @if(Auth::user()->role_id == role('super-admin'))
                                 <td>
@@ -81,7 +80,6 @@
                                 <td align="right">{{ number_format($office->late_fund,0,',',',') }}</td>
                                 <td align="right">{{ number_format($office->debt_fund,0,',',',') }}</td>
                                 <td align="right">{{ number_format($office->total,0,',',',') }}</td>
-                                <td align="center">-</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -98,7 +96,9 @@
 
 <script type="text/javascript">
     // DataTable
-    Spandiv.DataTable("#datatable");
+    Spandiv.DataTable("#datatable", {
+        orderAll: true
+    });
 </script>
 
 @endsection

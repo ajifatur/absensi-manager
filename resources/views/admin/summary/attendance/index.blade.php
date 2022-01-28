@@ -66,7 +66,6 @@
                     <table class="table table-sm table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
-                                <th width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
                                 <th>Karyawan</th>
                                 <th width="150" class="{{ Request::query('office') != '' && Request::query('office') != 0 ? 'd-none' : '' }}">Kantor</th>
                                 <th width="150">Jam Kerja</th>
@@ -75,14 +74,12 @@
                                 <th width="60">Sakit</th>
                                 <th width="60">Izin</th>
                                 <th width="60">Cuti</th>
-                                <th width="20">Opsi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($users as $user)
+                            @foreach($users as $key=>$user)
                                 @foreach($user->workhours as $workhour)
                                     <tr>
-                                        <td align="center"><input type="checkbox" class="form-check-input checkbox-one" data-id="{{ $user->id }}"></td>
                                         <td>
                                             <span class="d-none">{{ $user->end_date != null ? 1 : 0 }}-{{ $user->name }}</span>
                                             <a href="{{ route('admin.user.detail', ['id' => $user->id]) }}">{{ $user->name }}</a>
@@ -116,11 +113,6 @@
                                         <td align="right">
                                             <a href="{{ route('admin.summary.attendance.detail', ['id' => $user->id, 'category' => 5, 't1' => date('d/m/Y', strtotime($t1)), 't2' => date('d/m/Y', strtotime($t2))]) }}">{{ number_format($user->leave,0,',',',') }}</a>
                                         </td>
-                                        <td align="center">
-                                            <div class="btn-group">
-                                                <a href="{{ route('admin.summary.attendance.detail', ['id' => $user->id, 'category' => 1, 't1' => date('d/m/Y', strtotime($t1)), 't2' => date('d/m/Y', strtotime($t2))]) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Detail"><i class="bi-list"></i></a>
-                                            </div>
-                                        </td>
                                     </tr>
                                 @endforeach
                             @endforeach
@@ -140,7 +132,8 @@
     // DataTable
     Spandiv.DataTable("#datatable", {
         pageLength: -1,
-        rowsGroup: [0, 1, 2, 6, 7, 8]
+        rowsGroup: [0, 1, 5, 6, 7],
+        orderAll: true
     });
 
     // Datepicker

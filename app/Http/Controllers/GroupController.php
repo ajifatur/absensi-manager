@@ -10,7 +10,7 @@ use App\Models\Office;
 
 class GroupController extends Controller
 {
-    public $tabs = ['office', 'position', 'admin', 'manager', 'employee', 'non-employee'];
+    public $tabs = ['office', 'position', 'admin', 'manager', 'member'];
 
     /**
      * Display a listing of the resource.

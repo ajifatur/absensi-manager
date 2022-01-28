@@ -172,7 +172,9 @@
                                     @endif
                                     <td align="center">
                                         <div class="btn-group">
+                                            @if(Request::query('role') == 'member')
                                             <a href="{{ route('admin.user.edit-certification', ['id' => $user->id]) }}" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Edit Sertifikasi"><i class="bi-star"></i></a>
+                                            @endif
                                             @if(has_access('UserController::edit', Auth::user()->role_id, false))
                                             <a href="{{ route('admin.user.edit', ['id' => $user->id]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="bi-pencil"></i></a>
                                             @endif
