@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Ajifatur\Helpers\RouteExt;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +14,7 @@ use Ajifatur\Helpers\RouteExt;
 */
 
 // Admin
-Route::group(['middleware' => ['admin']], function() {
+Route::group(['middleware' => ['admin', 'faturhelper.logs']], function() {
 	// Summary Attendance
 	Route::get('/admin/summary/attendance', 'SummaryAttendanceController@index')->name('admin.summary.attendance.index');
 	Route::get('/admin/summary/attendance/detail/{id}', 'SummaryAttendanceController@detail')->name('admin.summary.attendance.detail');
@@ -124,7 +123,7 @@ Route::group(['middleware' => ['admin']], function() {
 });
 
 // Guest
-Route::group(['middleware' => ['guest']], function() {
+Route::group(['middleware' => ['guest', 'faturhelper.logs']], function() {
     // Home
     Route::get('/', function () {
         return redirect()->route('auth.login');
@@ -132,8 +131,8 @@ Route::group(['middleware' => ['guest']], function() {
 });
 
 // FaturHelper Routes
-RouteExt::auth();
-RouteExt::admin();
+\Ajifatur\Helpers\RouteExt::auth();
+\Ajifatur\Helpers\RouteExt::admin();
 
 // $routes = collect(Route::getRoutes())->map(function($route) {
 // 	return $route->uri();
