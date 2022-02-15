@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Admin
-Route::group(['middleware' => ['admin', 'faturhelper.logs']], function() {
+Route::group(['middleware' => ['admin']], function() {
 	// Summary Attendance
 	Route::get('/admin/summary/attendance', 'SummaryAttendanceController@index')->name('admin.summary.attendance.index');
 	Route::get('/admin/summary/attendance/detail/{id}', 'SummaryAttendanceController@detail')->name('admin.summary.attendance.detail');
@@ -123,7 +123,7 @@ Route::group(['middleware' => ['admin', 'faturhelper.logs']], function() {
 });
 
 // Guest
-Route::group(['middleware' => ['guest', 'faturhelper.logs']], function() {
+Route::group(['middleware' => ['guest']], function() {
     // Home
     Route::get('/', function () {
         return redirect()->route('auth.login');
