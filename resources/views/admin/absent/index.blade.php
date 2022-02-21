@@ -11,6 +11,59 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
+            <div class="card-header d-sm-flex justify-content-center align-items-center">
+                <form id="form-filter" class="d-lg-flex" method="get" action="">
+                    <div class="mb-lg-0 mb-2">
+                        <select name="month" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Periode Bulan">
+                            @for($i=1; $i<=12; $i++)
+                            <option value="{{ $i }}" {{ $month == $i ? 'selected' : '' }}>{{ \Ajifatur\Helpers\DateTimeExt::month($i) }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
+                        <select name="year" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Periode Tahun">
+                            @for($i=2022; $i>=2020; $i--)
+                            <option value="{{ $i }}" {{ $year == $i ? 'selected' : '' }}>{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    @if(Auth::user()->role_id == role('super-admin'))
+                    <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
+                        <select name="group" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Perusahaan">
+                            <option value="0">--Pilih Perusahaan--</option>
+                            @foreach($groups as $group)
+                            <option value="{{ $group->id }}" {{ Request::query('group') == $group->id ? 'selected' : '' }}>{{ $group->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+                    <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
+                        <select name="office" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Kantor">
+                            <option value="0" disabled selected>--Pilih Kantor--</option>
+                            @if(Auth::user()->role_id == role('super-admin'))
+                                @if(Request::query('group') != 0)
+                                    @foreach(\App\Models\Group::find(Request::query('group'))->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                    <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
+                                    @endforeach
+                                @endif
+                            @elseif(Auth::user()->role_id == role('admin'))
+                                @foreach(\App\Models\Group::find(Auth::user()->group_id)->offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
+                                @endforeach
+                            @elseif(Auth::user()->role_id == role('manager'))
+                                @foreach(Auth::user()->managed_offices()->orderBy('is_main','desc')->orderBy('name','asc')->get() as $office)
+                                <option value="{{ $office->id }}" {{ Request::query('office') == $office->id ? 'selected' : '' }}>{{ $office->name }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    <div class="ms-lg-2 ms-0">
+                        <button type="submit" class="btn btn-sm btn-info" {{ Request::query('office') != null ? '' : 'disabled' }}><i class="bi-filter-square me-1"></i> Filter</button>
+                    </div>
+                </form>
+            </div>
+            <hr class="my-0">
+            @if(Request::query('office') != null)
             <div class="card-body">
                 @if(Session::get('message'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -26,9 +79,6 @@
                                 <th>Nama</th>
                                 <th width="200">Tidak Hadir</th>
                                 <th width="80">Tanggal</th>
-                                @if(Auth::user()->role_id == role('super-admin'))
-                                <th width="150">Perusahaan</th>
-                                @endif
                                 <th width="40">Opsi</th>
                             </tr>
                         </thead>
@@ -50,13 +100,6 @@
                                     <span class="d-none">{{ $absent->date }}</span>
                                     {{ date('d/m/Y', strtotime($absent->date)) }}
                                 </td>
-                                @if(Auth::user()->role_id == role('super-admin'))
-                                <td>
-                                    @if($absent->user->group)
-                                        <a href="{{ route('admin.group.detail', ['id' => $absent->user->group->id]) }}">{{ $absent->user->group->name }}</a>
-                                    @endif
-                                </td>
-                                @endif
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('admin.absent.edit', ['id' => $absent->id]) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit"><i class="bi-pencil"></i></a>
@@ -69,6 +112,7 @@
                     </table>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </div>
@@ -88,6 +132,32 @@
     
     // Button Delete
     Spandiv.ButtonDelete(".btn-delete", ".form-delete");
+
+    // Change Group
+    $(document).on("change", "select[name=group]", function() {
+        var group = $(this).val();
+        $.ajax({
+            type: "get",
+            url: "{{ route('api.office.index') }}",
+            data: {group: group},
+            success: function(result){
+                var html = '<option value="0" disabled selected>--Pilih Kantor--</option>';
+                $(result).each(function(key,value){
+                    html += '<option value="' + value.id + '">' + value.name + '</option>';
+                });
+                $("select[name=office]").html(html).removeAttr("disabled");
+            }
+        });
+    });
+
+    // Change the Office
+    $(document).on("change", "select[name=office]", function() {
+        var office = $("select[name=office]").val();
+        if(office !== null)
+            $("#form-filter").find("button[type=submit]").removeAttr("disabled");
+        else
+            $("#form-filter").find("button[type=submit]").attr("disabled","disabled");
+    });
 </script>
 
 @endsection

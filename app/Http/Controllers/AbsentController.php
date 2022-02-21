@@ -24,29 +24,63 @@ class AbsentController extends Controller
         // Check the access
         has_access(method(__METHOD__), Auth::user()->role_id);
 
-        // Get absents
-        if(Auth::user()->role_id == role('super-admin'))
-            $absents = Absent::has('user')->orderBy('date','desc')->get();
+        // Get the month and year
+        $month = $request->query('month') ?: date('m');
+        $year = $request->query('year') ?: date('Y');
+
+        // Get groups
+        $groups = Group::orderBy('name','asc')->get();
+
+        if(Auth::user()->role_id == role('super-admin')) {
+            // Get group
+            $group = Group::find($request->query('group'));
+
+            if($group) {
+                // Set params
+                $t1 = $month > 1 ? date('Y-m-d', strtotime($year.'-'.($month-1).'-'.$group->period_start)) : date('Y-m-d', strtotime(($year-1).'-12-'.$group->period_start));
+                $t2 = date('Y-m-d', strtotime($year.'-'.$month.'-'.$group->period_end));
+                $office = $request->query('office');
+
+                // Get absents
+                $absents = Absent::has('user')->whereHas('user', function (Builder $query) use ($group, $office) {
+                    return $query->where('group_id','=',$group->id)->where('office_id','=',$office);
+                })->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
+            }
+        }
         elseif(Auth::user()->role_id == role('admin')) {
+            // Set params
+            $t1 = $month > 1 ? date('Y-m-d', strtotime($year.'-'.($month-1).'-'.Auth::user()->group->period_start)) : date('Y-m-d', strtotime(($year-1).'-12-'.Auth::user()->group->period_start));
+            $t2 = date('Y-m-d', strtotime($year.'-'.$month.'-'.Auth::user()->group->period_end));
+            $office = $request->query('office');
+
+            // Get absents
             $group = Auth::user()->group_id;
-            $absents = Absent::has('user')->whereHas('user', function (Builder $query) use ($group) {
-                return $query->where('group_id','=',$group);
-            })->orderBy('date','desc')->get();
+            $absents = Absent::has('user')->whereHas('user', function (Builder $query) use ($group, $office) {
+                return $query->where('group_id','=',$group)->where('office_id','=',$office);
+            })->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
         }
         elseif(Auth::user()->role_id == role('manager')) {
+            // Set params
+            $t1 = $month > 1 ? date('Y-m-d', strtotime($year.'-'.($month-1).'-'.Auth::user()->group->period_start)) : date('Y-m-d', strtotime(($year-1).'-12-'.Auth::user()->group->period_start));
+            $t2 = date('Y-m-d', strtotime($year.'-'.$month.'-'.Auth::user()->group->period_end));
+            $office = $request->query('office');
+
             // Get the user
             $user = User::findOrFail(Auth::user()->id);
 
             // Get absents
             $group = Auth::user()->group_id;
-            $absents = Absent::has('user')->whereHas('user', function (Builder $query) use ($user, $group) {
-                return $query->where('group_id','=',$group)->whereIn('office_id',$user->managed_offices()->pluck('office_id')->toArray());
-            })->orderBy('date','desc')->get();
+            $absents = Absent::has('user')->whereHas('user', function (Builder $query) use ($user, $group, $office) {
+                return $query->where('group_id','=',$group)->where('office_id','=',$office)->whereIn('office_id',$user->managed_offices()->pluck('office_id')->toArray());
+            })->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
         }
 
         // View
         return view('admin/absent/index', [
-            'absents' => $absents
+            'absents' => isset($absents) ? $absents : [],
+            'month' => $month,
+            'year' => $year,
+            'groups' => $groups,
         ]);
     }
 
