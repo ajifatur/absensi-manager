@@ -24,8 +24,7 @@ class LeaveController extends Controller
         // Check the access
         has_access(method(__METHOD__), Auth::user()->role_id);
 
-        // Get the month and year
-        $month = $request->query('month') ?: date('m');
+        // Get the year
         $year = $request->query('year') ?: date('Y');
 
         // Get groups
@@ -35,49 +34,37 @@ class LeaveController extends Controller
             // Get group
             $group = Group::find($request->query('group'));
 
+            // Get leaves
             if($group) {
-                // Set params
-                $t1 = $month > 1 ? date('Y-m-d', strtotime($year.'-'.($month-1).'-'.$group->period_start)) : date('Y-m-d', strtotime(($year-1).'-12-'.$group->period_start));
-                $t2 = date('Y-m-d', strtotime($year.'-'.$month.'-'.$group->period_end));
-                $office = $request->query('office');
-
-                // Get leaves
+            $office = $request->query('office');
                 $leaves = Leave::has('user')->whereHas('user', function (Builder $query) use ($group, $office) {
                     return $query->where('group_id','=',$group->id)->where('office_id','=',$office);
-                })->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
+                })->whereYear('date',$year)->orderBy('date','desc')->get();
             }
         }
-        elseif(Auth::user()->role_id == role('admin')) {
-            // Set params
-            $t1 = $month > 1 ? date('Y-m-d', strtotime($year.'-'.($month-1).'-'.Auth::user()->group->period_start)) : date('Y-m-d', strtotime(($year-1).'-12-'.Auth::user()->group->period_start));
-            $t2 = date('Y-m-d', strtotime($year.'-'.$month.'-'.Auth::user()->group->period_end));
-            $office = $request->query('office');
-            
+        elseif(Auth::user()->role_id == role('admin')) {            
             // Get leaves
             $group = Auth::user()->group_id;
+            $office = $request->query('office');
             $leaves = Leave::has('user')->whereHas('user', function (Builder $query) use ($group, $office) {
                 return $query->where('group_id','=',$group)->where('office_id','=',$office);
-            })->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
+            })->whereYear('date',$year)->orderBy('date','desc')->get();
         }
         elseif(Auth::user()->role_id == role('manager')) {
-            // Set params
-            $t1 = $month > 1 ? date('Y-m-d', strtotime($year.'-'.($month-1).'-'.Auth::user()->group->period_start)) : date('Y-m-d', strtotime(($year-1).'-12-'.Auth::user()->group->period_start));
-            $t2 = date('Y-m-d', strtotime($year.'-'.$month.'-'.Auth::user()->group->period_end));
-            $office = $request->query('office');
-
             // Get the user
             $user = User::findOrFail(Auth::user()->id);
-
+         
+            // Get leaves
             $group = Auth::user()->group_id;
+            $office = $request->query('office');
             $leaves = Leave::has('user')->whereHas('user', function (Builder $query) use ($user, $group, $office) {
                 return $query->where('group_id','=',$group)->where('office_id','=',$office)->whereIn('office_id',$user->managed_offices()->pluck('office_id')->toArray());
-            })->where('date','>=',$t1)->where('date','<=',$t2)->orderBy('date','desc')->get();
+            })->whereYear('date',$year)->orderBy('date','desc')->get();
         }
 
         // View
         return view('admin/leave/index', [
             'leaves' => isset($leaves) ? $leaves : [],
-            'month' => $month,
             'year' => $year,
             'groups' => $groups,
         ]);

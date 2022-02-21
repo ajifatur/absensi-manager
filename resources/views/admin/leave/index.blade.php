@@ -14,13 +14,6 @@
             <div class="card-header d-sm-flex justify-content-center align-items-center">
                 <form id="form-filter" class="d-lg-flex" method="get" action="">
                     <div class="mb-lg-0 mb-2">
-                        <select name="month" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Periode Bulan">
-                            @for($i=1; $i<=12; $i++)
-                            <option value="{{ $i }}" {{ $month == $i ? 'selected' : '' }}>{{ \Ajifatur\Helpers\DateTimeExt::month($i) }}</option>
-                            @endfor
-                        </select>
-                    </div>
-                    <div class="ms-lg-2 ms-0 mb-lg-0 mb-2">
                         <select name="year" class="form-select form-select-sm" data-bs-toggle="tooltip" title="Pilih Periode Tahun">
                             @for($i=2022; $i>=2020; $i--)
                             <option value="{{ $i }}" {{ $year == $i ? 'selected' : '' }}>{{ $i }}</option>
