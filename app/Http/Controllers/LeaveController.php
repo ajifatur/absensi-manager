@@ -36,13 +36,13 @@ class LeaveController extends Controller
 
             // Get leaves
             if($group) {
-            $office = $request->query('office');
+                $office = $request->query('office');
                 $leaves = Leave::has('user')->whereHas('user', function (Builder $query) use ($group, $office) {
                     return $query->where('group_id','=',$group->id)->where('office_id','=',$office);
                 })->whereYear('date',$year)->orderBy('date','desc')->get();
             }
         }
-        elseif(Auth::user()->role_id == role('admin')) {            
+        elseif(Auth::user()->role_id == role('admin')) {
             // Get leaves
             $group = Auth::user()->group_id;
             $office = $request->query('office');
