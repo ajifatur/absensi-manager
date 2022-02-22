@@ -90,7 +90,7 @@
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}">Karyawan</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Tanggal Kontrak</th>
-                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Kehadiran</th>
+                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Kehadiran dan Cuti</th>
                                 @if(count($categories) > 0)
                                 <th colspan="{{ count($categories) }}">Rincian Gaji Kotor</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Total Gaji Kotor</th>
@@ -122,16 +122,17 @@
                                             <span class="badge bg-danger">Tidak Aktif</span>
                                         @endif
                                     </td>
-                                    <td align="{{ is_int($user->attendances) ? 'right' : 'left' }}">
+                                    <td align="left">
                                         @if(is_int($user->attendances))
-                                            {{ number_format($user->attendances,0,',',',') }}
+                                            <p class="mb-0">Kehadiran:<br><span class="text-success">{{ number_format($user->attendances,0,',',',') }}x</span></p>
+                                            <hr class="my-1">
+                                            <p class="mb-0">Cuti<span class="text-danger">*</span>: <br><span class="text-success">{{ number_format($user->leaves,0,',',',') }}x</span></p>
                                         @elseif(is_array($user->attendances))
                                             @foreach($user->attendances as $key=>$attendance)
-                                                <p class="mb-0">{{ $attendance['name'] }}:<br><span class="text-success">{{ $attendance['count'] }}x</span></p>
-                                                @if($key != count($user->attendances))
+                                                <p class="mb-0">{{ $attendance['name'] }}:<br><span class="text-success">{{ number_format($attendance['count'],0,',',',') }}x</span></p>
                                                 <hr class="my-1">
-                                                @endif
                                             @endforeach
+                                            <p class="mb-0">Cuti<span class="text-danger">*</span>: <br><span class="text-success">{{ number_format($user->leaves,0,',',',') }}x</span></p>
                                         @endif
                                     </td>
                                     @if(count($user->salary) > 0)
@@ -271,6 +272,7 @@
             success: function(response) {
                 $(".amount-indicator[data-user=" + user + "][data-category=" + category + "]").text(response.amount);
                 $(".subtotal-salary[data-user=" + user + "]").text(response.total);
+                $(".total-salary[data-user=" + user + "]").text(response.total);
             }
         });
     });

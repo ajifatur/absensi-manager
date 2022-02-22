@@ -4,6 +4,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Ajifatur\Helpers\Date;
 use App\Models\Attendance;
+use App\Models\Leave;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
@@ -187,6 +188,19 @@ if(!function_exists('debt_fund')) {
             $debt_fund = $user->debt_funds()->where('year','<=',$year)->where('month','<=',$month)->latest()->first();
             return $debt_fund ? $debt_fund->amount : 0;
         }
+        else
+            return 0;
+    }
+}
+
+// Count leaves
+if(!function_exists('leaves')) {
+    function leaves($user_id) {
+        // Get the user
+        $user = User::find($user_id);
+
+        if($user)
+            return Leave::where('user_id','=',$user->id)->where('date','>=',dt($user->id, 1))->where('date','<=',dt($user->id, 2))->count();
         else
             return 0;
     }

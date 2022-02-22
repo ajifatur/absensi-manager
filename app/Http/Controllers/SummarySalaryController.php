@@ -68,6 +68,9 @@ class SummarySalaryController extends Controller
                 // Set the attendance by month
                 $users[$key]->attendances = attendances($user->id);
 
+                // Set the leaves by month
+                $users[$key]->leaves = leaves($user->id);
+
                 // Set salaries
                 $salary = [];
                 $subtotalSalary = 0;
@@ -79,7 +82,7 @@ class SummarySalaryController extends Controller
                         $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
                         if($category->multiplied_by_attendances != 0) {
                             if(is_int($users[$key]->attendances))
-                                $amount = $amount * $users[$key]->attendances;
+                                $amount = $amount * ($users[$key]->attendances + $users[$key]->leaves);
                             elseif(is_array($users[$key]->attendances))
                                 $amount = $amount * $users[$key]->attendances[$category->multiplied_by_attendances]['count'];
                         }
@@ -168,6 +171,9 @@ class SummarySalaryController extends Controller
         // Set attendances by month
         $attendances = attendances($user->id);
 
+        // Set leaves by month
+        $leaves = leaves($user->id);
+
         // Get the category
         $category = SalaryCategory::where('group_id','=',$user->group_id)->find($request->category);
 
@@ -175,7 +181,7 @@ class SummarySalaryController extends Controller
         $amount = Salary::getAmountByRange($request->value, $user->group_id, $request->category);
         if($category->multiplied_by_attendances != 0) {
             if(is_int($attendances))
-                $amount = $amount * $attendances;
+                $amount = $amount * ($attendances + $leaves);
             elseif(is_array($attendances))
                 $amount = $amount * $attendances[$category->multiplied_by_attendances]['count'];
         }
@@ -254,6 +260,9 @@ class SummarySalaryController extends Controller
 
         // Set attendances by month
         $attendances = attendances($user->id);
+
+        // Set leaves by month
+        $leaves = leaves($user->id);
                 
         // Set subtotal
         $categories = SalaryCategory::where('group_id','=',$user->group_id)->where('position_id','=',$user->position_id)->get();
@@ -267,7 +276,7 @@ class SummarySalaryController extends Controller
                 $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
                 if($category->multiplied_by_attendances != 0) {
                     if(is_int($attendances))
-                        $amount = $amount * $attendances;
+                        $amount = $amount * ($attendances + $leaves);
                     elseif(is_array($attendances))
                         $amount = $amount * $attendances[$category->multiplied_by_attendances]['count'];
                 }
@@ -278,7 +287,7 @@ class SummarySalaryController extends Controller
                 $amount = Salary::getAmountByRange(period($user->id), $user->group_id, $category->id);
                 if($category->multiplied_by_attendances != 0) {
                     if(is_int($attendances))
-                        $amount = $amount * $attendances;
+                        $amount = $amount * ($attendances + $leaves);
                     elseif(is_array($attendances))
                         $amount = $amount * $attendances[$category->multiplied_by_attendances]['count'];
                 }
@@ -290,7 +299,7 @@ class SummarySalaryController extends Controller
                 $amount = Salary::getAmountByRange($value, $user->group_id, $category->id);
                 if($category->multiplied_by_attendances != 0) {
                     if(is_int($attendances))
-                        $amount = $amount * $attendances;
+                        $amount = $amount * ($attendances + $leaves);
                     elseif(is_array($attendances))
                         $amount = $amount * $attendances[$category->multiplied_by_attendances]['count'];
                 }

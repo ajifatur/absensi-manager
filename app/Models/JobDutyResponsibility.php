@@ -14,7 +14,7 @@ class JobDutyResponsibility extends Model
      *
      * @var string
      */
-    protected $table = 'job__duties__responsibilities';
+    protected $table = 'job_duties_responsibilities';
 
     /**
      * Fill the model with an array of attributes.

@@ -14,7 +14,7 @@ class JobAuthority extends Model
      *
      * @var string
      */
-    protected $table = 'job__authorities';
+    protected $table = 'job_authorities';
 
     /**
      * Fill the model with an array of attributes.
