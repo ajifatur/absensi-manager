@@ -197,7 +197,7 @@
                         </tbody>
                         <tfoot class="bg-light fw-bold">
                             <tr>
-                                <td colspan="{{ count($categories) > 0 ? count($categories) + 7 : 1 + 7 }}">Total Gaji Karyawan</td>
+                                <td colspan="{{ count($categories) > 0 ? count($categories) + 7 : 6 }}">Total Gaji Karyawan</td>
                                 <td align="right"><span class="overall-salary">{{ number_format($overall,0,',',',') }}</span></td>
                                 <td></td>
                             </tr>
