@@ -55,6 +55,9 @@ class SummarySalaryController extends Controller
         // Set categories
         $categories = [];
 
+        // Set overall
+        $overall = 0;
+
         // Set the users props
         if(count($users) > 0) {
             foreach($users as $key=>$user) {                
@@ -134,6 +137,9 @@ class SummarySalaryController extends Controller
 
                 // Set the total salary
                 $users[$key]->totalSalary = $subtotalSalary - late_fund($users[$key]->id, $month, $year) - debt_fund($users[$key]->id, $month, $year);
+
+                // Set overall
+                $overall += $users[$key]->totalSalary;
             }
         }
 
@@ -144,6 +150,7 @@ class SummarySalaryController extends Controller
             'categories' => $categories,
             'month' => $month,
             'year' => $year,
+            'overall' => $overall,
         ]);
     }
 
@@ -185,11 +192,16 @@ class SummarySalaryController extends Controller
             elseif(is_array($attendances))
                 $amount = $amount * $attendances[$category->multiplied_by_attendances]['count'];
         }
+
+        // Set total
+        $total = $this->totalSalary($user->id, $request->month, $request->year);
         
         // Response
         return response()->json([
             'amount' => number_format($amount,0,',',','),
-            'total' => number_format($this->totalSalary($user->id, $request->month, $request->year)['subtotal'],0,',',',')
+            'subtotal' => number_format($total['subtotal'],0,',',','),
+            'total' => number_format($total['total'],0,',',','),
+            'overall' => number_format($this->overallSalary($user->id, $request->month, $request->year),0,',',','),
         ]);
     }
 
@@ -215,7 +227,8 @@ class SummarySalaryController extends Controller
         
         // Response
         return response()->json([
-            'total' => number_format($this->totalSalary($user->id, $request->month, $request->year)['total'],0,',',',')
+            'total' => number_format($this->totalSalary($user->id, $request->month, $request->year)['total'],0,',',','),
+            'overall' => number_format($this->overallSalary($user->id, $request->month, $request->year),0,',',','),
         ]);
     }
 
@@ -241,7 +254,8 @@ class SummarySalaryController extends Controller
         
         // Response
         return response()->json([
-            'total' => number_format($this->totalSalary($user->id, $request->month, $request->year)['total'],0,',',',')
+            'total' => number_format($this->totalSalary($user->id, $request->month, $request->year)['total'],0,',',','),
+            'overall' => number_format($this->overallSalary($user->id, $request->month, $request->year),0,',',','),
         ]);
     }
 
@@ -316,5 +330,30 @@ class SummarySalaryController extends Controller
             'subtotal' => $subtotal,
             'total' => $total,
         ];
+    }
+
+    /**
+     * Set the overall of salary.
+     *
+     * @param  int  $id
+     * @param  int  $month
+     * @param  int  $year
+     * @return array
+     */
+    public function overallSalary($id, $month, $year)
+    {
+        // Get the user
+        $user = User::find($id);
+
+        // Get user array
+        $userArray = User::where('role_id','=',$user->role_id)->where('group_id','=',$user->group_id)->where('office_id','=',$user->office_id)->where('position_id','=',$user->position_id)->pluck('id')->toArray();
+
+        // Count overall
+        $overall = 0;
+        foreach($userArray as $user_id) {
+            $overall += $this->totalSalary($user_id, $month, $year)['total'];
+        }
+
+        return $overall;
     }
 }

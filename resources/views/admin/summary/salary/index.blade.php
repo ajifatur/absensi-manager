@@ -195,6 +195,13 @@
                                 </tr>
                             @endforeach
                         </tbody>
+                        <tfoot class="bg-light fw-bold">
+                            <tr>
+                                <td colspan="{{ count($categories) > 0 ? count($categories) + 7 : 1 + 7 }}">Total Gaji Karyawan</td>
+                                <td align="right"><span class="overall-salary">{{ number_format($overall,0,',',',') }}</span></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -271,8 +278,9 @@
             data: {_token: "{{ csrf_token() }}", user: user, category: category, month: month, year: year, value: value},
             success: function(response) {
                 $(".amount-indicator[data-user=" + user + "][data-category=" + category + "]").text(response.amount);
-                $(".subtotal-salary[data-user=" + user + "]").text(response.total);
+                $(".subtotal-salary[data-user=" + user + "]").text(response.subtotal);
                 $(".total-salary[data-user=" + user + "]").text(response.total);
+                $(".overall-salary").text(response.overall);
             }
         });
     });
@@ -289,6 +297,7 @@
             data: {_token: "{{ csrf_token() }}", user: user, month: month, year: year, amount: value},
             success: function(response) {
                 $(".total-salary[data-user=" + user + "]").text(response.total);
+                $(".overall-salary").text(response.overall);
             }
         });
         $(this).val(Spandiv.NumberFormat(value));
@@ -306,6 +315,7 @@
             data: {_token: "{{ csrf_token() }}", user: user, month: month, year: year, amount: value},
             success: function(response) {
                 $(".total-salary[data-user=" + user + "]").text(response.total);
+                $(".overall-salary").text(response.overall);
             }
         });
         $(this).val(Spandiv.NumberFormat(value));
