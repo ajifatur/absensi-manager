@@ -72,7 +72,7 @@
                                 <th width="120">Jam Kerja</th>
                                 <th>Absen Masuk</th>
                                 <th>Absen Keluar</th>
-                                <th width="180">Lokasi</th>
+                                <th width="100">IP Address</th>
                                 <th width="40">Opsi</th>
                             </tr>
                         </thead>
@@ -133,16 +133,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <?php $location = json_decode(location_info($attendance->ip_address), true); ?>
-                                    @if(is_array($location))
-                                    <strong>IP:</strong> {{ $location['ip'] }}
-                                    <hr class="my-1">
-                                    <strong>Kota:</strong> {{ $location['cityName'] }}
-                                    <hr class="my-1">
-                                    <strong>Regional:</strong> {{ $location['regionName'] }}
-                                    <hr class="my-1">
-                                    <strong>Negara:</strong> {{ $location['countryName'] }}
-                                    @endif
+                                    {{ $attendance->ip_address }}
                                 </td>
                                 <td>
                                     <div class="btn-group">
