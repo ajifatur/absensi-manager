@@ -166,6 +166,7 @@ return [
          * Package Service Providers...
          */
         Ajifatur\FaturHelper\FaturHelperServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Application Service Providers...

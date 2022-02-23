@@ -6,7 +6,12 @@
 
 <div class="d-sm-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-2 mb-sm-0">Rekapitulasi Penggajian</h1>
-    <a href="{{ route('admin.summary.office.index') }}" class="btn btn-sm btn-primary"><i class="bi-briefcase me-1"></i> Penggajian Kantor</a>
+    <div class="btn-group">
+        <a href="{{ route('admin.summary.office.index') }}" class="btn btn-sm btn-primary"><i class="bi-briefcase me-1"></i> Penggajian Kantor</a>
+        @if(count(Request::query()) > 0)
+        <a href="{{ route('admin.summary.salary.export', Request::query()) }}" class="btn btn-sm btn-success"><i class="bi-file-excel me-1"></i> Export ke Excel</a>
+        @endif
+    </div>
 </div>
 <div class="row">
     <div class="col-12">
@@ -87,7 +92,6 @@
                     <table class="table table-sm table-bordered" id="datatable">
                         <thead class="bg-light">
                             <tr>
-                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="20"><input type="checkbox" class="form-check-input checkbox-all"></th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}">Karyawan</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Tanggal Kontrak</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Kehadiran dan Cuti</th>
@@ -97,7 +101,6 @@
                                 @endif
                                 <th colspan="2">Rincian Potongan</th>
                                 <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="80">Total Gaji Bersih</th>
-                                <th rowspan="{{ count($categories) > 0 ? 2 : 1 }}" width="40">Opsi</th>
                             </tr>
                             @if(Request::query('office') != null && Request::query('position') != null && count($categories) > 0)
                                 <tr>
@@ -112,7 +115,6 @@
                         <tbody>
                             @foreach($users as $user)
                                 <tr>
-                                    <td align="center"><input type="checkbox" class="form-check-input checkbox-one"></td>
                                     <td><a href="{{ route('admin.user.detail', ['id' => $user->id]) }}">{{ $user->name }}</a></td>
                                     <td>
                                         <span class="d-none">{{ $user->end_date == null ? 1 : 0 }} {{ $user->start_date }}</span>
@@ -187,19 +189,13 @@
                                             <span class="total-salary" data-user="{{ $user->id }}">{{ number_format($user->totalSalary,0,',',',') }}</span>
                                         </td>
                                     @endif
-                                    <td align="center">
-                                        <div class="btn-group">
-                                            -
-                                        </div>
-                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <tfoot class="bg-light fw-bold">
                             <tr>
-                                <td colspan="{{ count($categories) > 0 ? count($categories) + 7 : 6 }}">Total Gaji Karyawan</td>
+                                <td colspan="{{ count($categories) > 0 ? count($categories) + 6 : 5 }}">Total Gaji Karyawan</td>
                                 <td align="right"><span class="overall-salary">{{ number_format($overall,0,',',',') }}</span></td>
-                                <td></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -216,7 +212,9 @@
 
 <script type="text/javascript">
     // DataTable
-    Spandiv.DataTable("#datatable");
+    Spandiv.DataTable("#datatable", {
+        orderAll: true
+    });
 	
 	// Popover
     Spandiv.Popover();

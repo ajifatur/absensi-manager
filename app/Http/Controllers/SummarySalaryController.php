@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 use Ajifatur\Helpers\Date;
 use Ajifatur\Helpers\DateTimeExt;
 use Ajifatur\Helpers\Salary;
@@ -20,9 +21,11 @@ use App\Models\UserIndicator;
 use App\Models\UserDebtFund;
 use App\Models\UserLateFund;
 use App\Models\Attendance;
+use App\Exports\SalaryExport;
 
 class SummarySalaryController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -33,15 +36,43 @@ class SummarySalaryController extends Controller
     {
         // Check the access
         has_access(method(__METHOD__), Auth::user()->role_id);
-        
+
+        // Get data
+        $data = $this->data($request);
+
+        // Get groups
+        $groups = Group::orderBy('name','asc')->get();
+
+        // View
+        return view('admin/summary/salary/index', [
+            'groups' => $groups,
+            'users' => $data['users'],
+            'categories' => $data['categories'],
+            'month' => $data['month'],
+            'year' => $data['year'],
+            'overall' => $data['overall'],
+        ]);
+    }
+
+    /**
+     * Get data
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function data(Request $request)
+    {
         // Get users
         if(Auth::user()->role_id == role('super-admin')) {
+            $group = Group::find($request->query('group'));
             $users = User::where('role_id','=',role('member'))->where('group_id','=',$request->query('group'))->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->orderBy('name','asc')->get();
         }
         elseif(Auth::user()->role_id == role('admin')) {
+            $group = Group::find(Auth::user()->group_id);
             $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->orderBy('name','asc')->get();
         }
         elseif(Auth::user()->role_id == role('manager')) {
+            $group = Group::find(Auth::user()->group_id);
             $users = User::where('role_id','=',role('member'))->where('group_id','=',Auth::user()->group_id)->where('office_id','=',$request->query('office'))->where('position_id','=',$request->query('position'))->orderBy('name','asc')->get();
         }
 
@@ -49,13 +80,8 @@ class SummarySalaryController extends Controller
         $month = $request->query('month') ?: date('m');
         $year = $request->query('year') ?: date('Y');
 
-        // Get groups
-        $groups = Group::orderBy('name','asc')->get();
-
-        // Set categories
+        // Set categories and overall
         $categories = [];
-
-        // Set overall
         $overall = 0;
 
         // Set the users props
@@ -132,26 +158,20 @@ class SummarySalaryController extends Controller
                 }
                 $users[$key]->salary = $salary;
 
-                // Set the subtotal salary
-                $users[$key]->subtotalSalary = $subtotalSalary;
-
-                // Set the total salary
-                $users[$key]->totalSalary = $subtotalSalary - late_fund($users[$key]->id, $month, $year) - debt_fund($users[$key]->id, $month, $year);
-
-                // Set overall
-                $overall += $users[$key]->totalSalary;
+                $users[$key]->subtotalSalary = $subtotalSalary; // Subtotal
+                $users[$key]->totalSalary = $subtotalSalary - late_fund($users[$key]->id, $month, $year) - debt_fund($users[$key]->id, $month, $year); // Total
+                $overall += $users[$key]->totalSalary; // Overall
             }
         }
 
-        // View
-        return view('admin/summary/salary/index', [
+        return [
+            'group' => $group,
             'users' => $users,
-            'groups' => $groups,
             'categories' => $categories,
             'month' => $month,
             'year' => $year,
             'overall' => $overall,
-        ]);
+        ];
     }
 
     /**
@@ -355,5 +375,26 @@ class SummarySalaryController extends Controller
         }
 
         return $overall;
+    }
+
+    /**
+     * Export to Excel.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function export(Request $request)
+    {
+        // Set memory limit
+        ini_set("memory_limit", "-1");
+
+        // Get data
+        $data = $this->data($request);
+
+        // File name
+        $filename = 'Gaji Karyawan_'.$data["group"]->name.'_'.$data["year"].'_'.DateTimeExt::month($data["month"]);
+
+        // Return
+        return Excel::download(new SalaryExport($data), $filename.'.xlsx');
     }
 }

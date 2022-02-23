@@ -22,6 +22,7 @@ Route::group(['middleware' => ['admin']], function() {
 
 	// Summary Salary
 	Route::get('/admin/summary/salary', 'SummarySalaryController@index')->name('admin.summary.salary.index');
+	Route::get('/admin/summary/salary/export', 'SummarySalaryController@export')->name('admin.summary.salary.export');
 	Route::post('/admin/summary/salary/update/indicator', 'SummarySalaryController@updateIndicator')->name('admin.summary.salary.update.indicator');
 	Route::post('/admin/summary/salary/update/late-fund', 'SummarySalaryController@updateLateFund')->name('admin.summary.salary.update.late-fund');
 	Route::post('/admin/summary/salary/update/debt-fund', 'SummarySalaryController@updateDebtFund')->name('admin.summary.salary.update.debt-fund');
