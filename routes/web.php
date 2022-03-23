@@ -134,11 +134,3 @@ Route::group(['middleware' => ['guest']], function() {
 // FaturHelper Routes
 \Ajifatur\Helpers\RouteExt::auth();
 \Ajifatur\Helpers\RouteExt::admin();
-
-// $routes = collect(Route::getRoutes())->map(function($route) {
-// 	return $route->uri();
-// });
-// echo "<pre>";
-// var_dump($routes);
-// echo "</pre>";
-// return;
